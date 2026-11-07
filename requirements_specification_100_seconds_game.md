@@ -4,7 +4,7 @@
 O objetivo deste projeto é desenvolver uma aplicação web de perguntas e respostas rápidas de matemática (estilo *time-attack*), inspirada no modo "100 segundos" do site *Tabuada de Multiplicar*. Em vez de multiplicação, o foco pedagógico será nas principais **potenciações** e **radiciações** ensinadas no período escolar. O jogador terá $100$ segundos para responder ao maior número possível de questões, contando com progressão dinâmica de dificuldade, sistema de recompensas por estrelas, histórico pessoal e tabelas de classificação (*Highscores*).
 
 ### Stack Tecnológica
-* **Frontend:** React.js (inicializado com Vite), Tailwind CSS (sugerido para estilização rápida similar ao layout original).
+* **Frontend:** React.js com TypeScript (inicializado com Vite) e **Mantine** como biblioteca de componentes e estilização.
 * **Backend:** Java com Spring Boot (Spring Web, Spring Security/JWT, Spring Data JPA).
 * **Banco de Dados:** PostgreSQL.
 * **Infraestrutura:** Docker e Docker Compose para containerização de todos os serviços (frontend, backend e banco de dados).
@@ -240,3 +240,33 @@ Todos os serviços serão executados via **Docker Compose**:
 * Credenciais e configurações (ex: `POSTGRES_PASSWORD`, `JWT_SECRET`, `DATABASE_URL`) via variáveis de ambiente em arquivo `.env` (não versionado), com um `.env.example` versionado.
 * O serviço `api` deve depender do `db` (`depends_on` com `healthcheck`).
 * Um único comando deve subir o ambiente completo: `docker compose up --build`.
+
+---
+
+## 10. Estratégia de Testes
+
+### 10.1. Backend
+* **JUnit 5** para testes unitários, com **Mockito** para isolar dependências (ports/repositórios).
+* Prioridade de cobertura: camada `domain` (cálculo de estrelas, validação anti-fraude, períodos de ranking) e `application` (casos de uso).
+* Testes de integração (controllers + banco) com `@SpringBootTest` / `@WebMvcTest` e Testcontainers (PostgreSQL), quando necessário.
+
+### 10.2. Frontend
+* **Vitest** + **React Testing Library** para testes unitários e de componentes (API compatível com Jest e integrada nativamente ao Vite).
+  * Prioridade: `domain/` (gerador de questões, progressão de dificuldade, regra de não repetir questão consecutiva, cálculo de estrelas).
+* **Playwright** para testes end-to-end (fluxo completo: início → contagem → partida → resultado → highscores).
+
+---
+
+## 11. Plano de Implementação (por partes)
+
+| Parte | Escopo | Entregáveis |
+| :--- | :--- | :--- |
+| **1** | Infraestrutura base | `docker-compose.yml` (PostgreSQL), `.env.example`, dependências do backend (Web, JPA, Security, Validation, Flyway), migration inicial das tabelas |
+| **2** | Backend – domínio e casos de uso | Entidades, enums, ports, regras (estrelas, anti-fraude) e casos de uso com testes JUnit |
+| **3** | Backend – infraestrutura e API | Persistência JPA, autenticação JWT, controllers dos endpoints da seção 7, tratamento de erros |
+| **4** | Frontend – domínio do jogo | Gerador de questões e níveis de dificuldade com testes Vitest |
+| **5** | Frontend – telas | Mantine, telas da seção 5 (inicial, contagem, partida, highscores), som dos últimos 10 s |
+| **6** | Integração | Clientes HTTP, login/cadastro, `localStorage` para convidados, salvamento de pontuação |
+| **7** | Containerização final e E2E | Dockerfiles de `api` e `web_app`, compose completo, testes Playwright |
+
+Cada parte termina com testes passando e um commit.
