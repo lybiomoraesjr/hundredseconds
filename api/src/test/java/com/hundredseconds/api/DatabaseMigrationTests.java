@@ -65,4 +65,23 @@ class DatabaseMigrationTests {
 			.isInstanceOf(DataIntegrityViolationException.class);
 	}
 
+	@Test
+	void shouldDefaultWrongAnswersToZero() {
+		jdbcTemplate.update("INSERT INTO game_scores (player_name, game_mode, score, stars_earned) VALUES (?, ?, ?, ?)",
+				"guest", "EXPONENTIATION", 5, 0);
+
+		Integer wrongAnswers = jdbcTemplate
+			.queryForObject("SELECT wrong_answers FROM game_scores WHERE player_name = 'guest'", Integer.class);
+
+		assertThat(wrongAnswers).isZero();
+	}
+
+	@Test
+	void shouldRejectNegativeWrongAnswers() {
+		assertThatThrownBy(() -> jdbcTemplate.update(
+				"INSERT INTO game_scores (player_name, game_mode, score, stars_earned, wrong_answers) VALUES (?, ?, ?, ?, ?)",
+				"guest", "EXPONENTIATION", 5, 0, -1))
+			.isInstanceOf(DataIntegrityViolationException.class);
+	}
+
 }

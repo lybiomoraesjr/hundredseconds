@@ -39,7 +39,10 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
   * O foco do cursor (*autofocus*) deve permanecer sempre na caixa de texto central.
   * O jogador digita os números no teclado e pressiona a tecla `Enter` (ou clica no botão "Respondida") para submeter.
   * **Acerto:** Soma $+1$ ao resultado atual, limpa o campo de texto imediatamente e gera a próxima questão.
-  * **Erro:** (Comportamento padrão sugerido) Limpa o campo de texto ou exibe um breve alerta visual (ex: borda vermelha ou *shake*) para que o usuário tente novamente, ou avança sem pontuar, conforme preferência de implementação.
+  * **Erro (1ª tentativa):** A caixa de texto recebe uma **borda vermelha**, o campo é limpo e o jogador pode tentar **mais uma vez** a mesma questão.
+  * **Erro (2ª tentativa):** A caixa de texto desaparece e a **resposta correta é exibida cobrindo toda a tela por $1$ segundo**; em seguida uma nova questão é gerada (sem pontuar). O cronômetro **continua correndo** durante esse segundo.
+  * **Contador de erros:** Cada resposta errada submetida soma $+1$ ao contador `wrongAnswers` da partida (uma questão pode gerar até $2$ erros). Submissões vazias são ignoradas e não contam como erro.
+  * **Fim da partida:** Após os $100$ segundos é exibida uma tela de resultado com a quantidade de acertos, estrelas e **quantidade de respostas erradas**.
 
 ### 2.3. Sistema de Estrelas
 * Na parte inferior da tela do jogo, existem $10$ espaços para estrelas (inicialmente brancas/vazias).
@@ -96,7 +99,7 @@ O gerador de questões deve se basear na pontuação atual (`score`) da partida 
     * `Resultado mais alto de hoje:` (Maior pontuação global registrada no dia atual).
     * `Resultado mais alto deste ano:` (Maior pontuação global registrada no ano corrente).
 * **RF04 - Execução da Partida:**
-  * Gerenciar o estado do jogo (`IDLE`, `COUNTDOWN`, `PLAYING`, `FINISHED`), cronômetro de $100$ segundos, validação de respostas em tempo real e atribuição de estrelas.
+  * Gerenciar o estado do jogo (`IDLE`, `COUNTDOWN`, `PLAYING`, `FINISHED`), cronômetro de $100$ segundos, validação de respostas em tempo real (com até $2$ tentativas por questão), contagem de respostas erradas e atribuição de estrelas.
 * **RF05 - Tabela de Classificação (Highscores) e Histórico:**
   * Ao clicar no botão "Highscores", exibir um modal ou tela sobreposta listando o **Top 10** de resultados.
   * Permitir filtrar a tabela por 4 abas:
@@ -110,7 +113,7 @@ O gerador de questões deve se basear na pontuação atual (`score`) da partida 
 ## 4. Requisitos Não Funcionais (RNF)
 
 * **RNF01 - Latência Zero na Troca de Questões:** A geração de perguntas e validação de respostas durante os $100$ segundos deve ocorrer no *client-side* (React) para garantir que não haja atraso de rede (*lag*) entre o usuário apertar `Enter` e a próxima questão aparecer. Ao final dos $100$ segundos, o resultado consolidado é enviado ao backend Spring Boot.
-* **RNF02 - Segurança Anti-Fraude Básica:** A requisição de salvamento de pontuação ao final da partida deve conter metadados básicos (como o tempo gasto e quantidade de questões por nível) ou validação de limite humano plausível no backend (ex: rejeitar pontuações impossíveis como $> 300$ acertos em $100$ segundos).
+* **RNF02 - Segurança Anti-Fraude Básica:** A requisição de salvamento de pontuação ao final da partida deve conter metadados básicos (como o tempo gasto e quantidade de questões por nível) ou validação de limite humano plausível no backend (ex: rejeitar pontuações impossíveis como $> 300$ acertos ou $> 300$ respostas erradas em $100$ segundos).
 * **RNF03 - Responsividade e Acessibilidade:** O layout deve priorizar o uso do teclado físico em desktops e exibir o teclado numérico nativo (`inputmode="numeric"`) em dispositivos móveis.
 * **RNF04 - Renderização Matemática Clara:** No React, as potências devem usar a tag `<sup>` (ex: `2<sup>3</sup>`) e as raízes devem ter representação visual clara de índice e radicando para leitura imediata.
 
@@ -136,6 +139,9 @@ O gerador de questões deve se basear na pontuação atual (`score`) da partida 
    * Topo direito: Botão fechar (`X`).
    * Centro: Quadro arredondado com título dinâmico (ex: "Resultado mais alto de hoje") e tabela de $1.$ a $10.$ com colunas `Nome` e `Resultado`.
    * Rodapé: Botão "Voltar".
+5. **Tela de Resultado (fim da partida):**
+   * Exibe `Resultado` (acertos), estrelas conquistadas e `Respostas erradas`.
+   * Botões "Jogar novamente" e "Highscores".
 
 ---
 
@@ -159,6 +165,7 @@ O gerador de questões deve se basear na pontuação atual (`score`) da partida 
 | `game_mode` | `VARCHAR(20)` | `NOT NULL` | `'EXPONENTIATION'` ou `'ROOT_EXTRACTION'` |
 | `score` | `INTEGER` | `NOT NULL` | Quantidade de respostas corretas |
 | `stars_earned` | `INTEGER` | `NOT NULL` | Estrelas ganhas ($\min(10, \lfloor \text{score} / 10 \rfloor)$) |
+| `wrong_answers` | `INTEGER` | `NOT NULL DEFAULT 0` | Quantidade de respostas erradas submetidas na partida |
 | `played_at` | `TIMESTAMP` | `DEFAULT NOW()` | Data e hora da partida (indexada para filtros de Dia/Semana/Ano) |
 
 *(Sugestão de Índice no PostgreSQL: `CREATE INDEX idx_scores_mode_date ON game_scores (game_mode, played_at DESC, score DESC);` para deixar as buscas de ranking extremamente rápidas).*
@@ -173,7 +180,7 @@ O gerador de questões deve se basear na pontuação atual (`score`) da partida 
 
 ### Pontuações e Rankings (`/api/scores`)
 * `POST /api/scores` - Salva o resultado de uma partida finalizada.
-  * *Payload:* `{ "gameMode": "EXPONENTIATION", "score": 105 }`
+  * *Payload:* `{ "gameMode": "EXPONENTIATION", "score": 105, "wrongAnswers": 7, "playerName": "opcional, apenas para convidados" }`
 * `GET /api/scores/summary?mode={EXPONENTIATION|ROOT_EXTRACTION}` - Retorna os 3 números da tela inicial (`personalBest`, `todayBest`, `yearBest`).
 * `GET /api/scores/leaderboard?mode={EXPONENTIATION|ROOT_EXTRACTION}&period={DAY|WEEK|YEAR|USER}` - Retorna a lista com o Top 10 para a aba selecionada na tela de Highscores.
 ---
