@@ -16,7 +16,7 @@ interface HighscoresModalProps {
 export function HighscoresModal({ mode, onClose }: HighscoresModalProps) {
   const { scoreGateway } = useAppServices()
   const [period, setPeriod] = useState<LeaderboardPeriod>(LeaderboardPeriod.USER)
-  const [loaded, setLoaded] = useState<{ key: string; entries: LeaderboardEntry[] } | null>(null)
+  const [loaded, setLoaded] = useState<{ key: string; entries: LeaderboardEntry[] | 'ERROR' } | null>(null)
 
   const requestKey = `${mode}:${period}`
   // While the selected tab has not loaded yet, show the loader
@@ -26,7 +26,7 @@ export function HighscoresModal({ mode, onClose }: HighscoresModalProps) {
     let active = true
     scoreGateway.getLeaderboard(mode, period)
       .then((result) => active && setLoaded({ key: `${mode}:${period}`, entries: result }))
-      .catch(() => active && setLoaded({ key: `${mode}:${period}`, entries: [] }))
+      .catch(() => active && setLoaded({ key: `${mode}:${period}`, entries: 'ERROR' }))
     return () => {
       active = false
     }
@@ -46,6 +46,8 @@ export function HighscoresModal({ mode, onClose }: HighscoresModalProps) {
         <Title order={4} ta="center" mb="sm">{messages.leaderboard.titles[period]}</Title>
         {entries === null ? (
           <Center py="lg"><Loader size="sm" aria-label={messages.leaderboard.loading} /></Center>
+        ) : entries === 'ERROR' ? (
+          <Text ta="center" c="red" py="lg" role="alert">{messages.leaderboardError}</Text>
         ) : entries.length === 0 ? (
           <Text ta="center" c="dimmed" py="lg">{messages.leaderboard.empty}</Text>
         ) : (

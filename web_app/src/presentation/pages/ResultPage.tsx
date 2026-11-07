@@ -2,12 +2,16 @@ import { Badge, Button, Group, SimpleGrid, Stack, Text, Title } from '@mantine/c
 import type { FinishedMatch } from '../../application/ports/ScoreGateway'
 import { starsFor } from '../../domain'
 import { GameBoard } from '../components/GameBoard'
+import { SaveStatusPanel, type SaveState } from '../components/SaveStatusPanel'
 import { StarBar } from '../components/StarBar'
 import { messages } from '../i18n/messages'
 
 interface ResultPageProps {
   match: FinishedMatch
   isNewRecord: boolean
+  saveState: SaveState
+  isGuest: boolean
+  onSubmitGuestName: (name: string) => Promise<void>
   onPlayAgain: () => void
   onBackHome: () => void
   onOpenHighscores: () => void
@@ -22,7 +26,9 @@ function Stat({ label, value, testId }: { label: string; value: number; testId: 
   )
 }
 
-export function ResultPage({ match, isNewRecord, onPlayAgain, onBackHome, onOpenHighscores }: ResultPageProps) {
+export function ResultPage({
+  match, isNewRecord, saveState, isGuest, onSubmitGuestName, onPlayAgain, onBackHome, onOpenHighscores,
+}: ResultPageProps) {
   const stars = starsFor(match.score)
   return (
     <GameBoard footer={<StarBar stars={stars} />}>
@@ -35,7 +41,8 @@ export function ResultPage({ match, isNewRecord, onPlayAgain, onBackHome, onOpen
           <Stat label={messages.result.stars} value={stars} testId="result-stars" />
           <Stat label={messages.result.wrongAnswers} value={match.wrongAnswers} testId="result-wrong" />
         </SimpleGrid>
-        <Group justify="center" mt="md">
+        <SaveStatusPanel state={saveState} isGuest={isGuest} onSubmitGuestName={onSubmitGuestName} />
+        <Group justify="center" mt="xs">
           <Button size="lg" color="green.6" onClick={onPlayAgain}>{messages.result.playAgain}</Button>
           <Button size="lg" variant="white" color="orange.8" onClick={onBackHome}>{messages.result.backHome}</Button>
         </Group>

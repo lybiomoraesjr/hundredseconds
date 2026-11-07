@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { GameMode, LeaderboardPeriod } from '../domain'
@@ -44,7 +44,7 @@ describe('App', () => {
   it('plays a full match, saves it and shows the result screen', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: false })
     const services = createServices()
-    renderWithProviders(<App />, services)
+    const { unmount } = renderWithProviders(<App />, services)
     const user = userEvent.setup({ delay: null })
 
     await user.click(screen.getByRole('button', { name: 'Início' }))
@@ -57,8 +57,24 @@ describe('App', () => {
     expect(screen.getByTestId('result-wrong')).toHaveTextContent('0')
     expect(services.scoreGateway.saveScore)
       .toHaveBeenCalledWith({ mode: GameMode.EXPONENTIATION, score: 0, wrongAnswers: 0 })
+    // Guests are offered to publish the result on the global ranking
+    expect(await screen.findByLabelText('Seu nome')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Jogar novamente' }))
     expect(screen.getByText('3')).toBeInTheDocument()
+    unmount()
+    vi.useRealTimers()
+  })
+  it('shows the logged player and lets them log out', async () => {
+    renderWithProviders(<App />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Entrar' }))
+    await userEvent.type(screen.getByLabelText('E-mail'), 'ana@mail.com')
+    await userEvent.type(screen.getByLabelText('Senha'), 'secret123')
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Entrar' }))
+
+    expect(await screen.findByText('Olá, ana!')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Sair' }))
+    expect(screen.getByRole('button', { name: 'Entrar' })).toBeInTheDocument()
   })
 })

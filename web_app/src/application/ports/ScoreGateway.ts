@@ -21,9 +21,12 @@ export interface FinishedMatch {
   readonly wrongAnswers: number
 }
 
-/** Where scores are read from and saved to (browser storage or the API). */
+/** Where scores are read from and saved to (browser storage and/or the API). */
 export interface ScoreGateway {
   getSummary(mode: GameMode): Promise<ScoreSummary>
   getLeaderboard(mode: GameMode, period: LeaderboardPeriod): Promise<LeaderboardEntry[]>
+  /** Saves a finished match for the current player (logged player or guest). */
   saveScore(match: FinishedMatch): Promise<void>
+  /** Publishes a guest match on the global ranking under the informed name. */
+  submitGuestScore(match: FinishedMatch, playerName: string): Promise<void>
 }

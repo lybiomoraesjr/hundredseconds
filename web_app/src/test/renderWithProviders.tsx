@@ -3,6 +3,8 @@ import { act, render } from '@testing-library/react'
 import type { ReactElement } from 'react'
 import { vi } from 'vitest'
 import { AppServicesProvider, type AppServices } from '../application/AppServices'
+import { SessionStore } from '../application/auth/SessionStore'
+import type { AuthGateway } from '../application/ports/AuthGateway'
 import type { ScoreGateway } from '../application/ports/ScoreGateway'
 import { QuestionGenerator } from '../domain'
 import { theme } from '../presentation/theme'
@@ -12,6 +14,24 @@ export function createFakeGateway(overrides: Partial<ScoreGateway> = {}): ScoreG
     getSummary: vi.fn().mockResolvedValue({ personalBest: null, todayBest: null, yearBest: null }),
     getLeaderboard: vi.fn().mockResolvedValue([]),
     saveScore: vi.fn().mockResolvedValue(undefined),
+    submitGuestScore: vi.fn().mockResolvedValue(undefined),
+    ...overrides,
+  }
+}
+
+export function createMemorySessionStore(): SessionStore {
+  return new SessionStore({ load: () => null, save: () => {}, clear: () => {} })
+}
+
+export function createFakeAuthGateway(overrides: Partial<AuthGateway> = {}): AuthGateway {
+  return {
+    register: vi.fn().mockResolvedValue(undefined),
+    login: vi.fn().mockImplementation(async ({ email }: { email: string }) => ({
+      accessToken: 'token',
+      userId: 'user-1',
+      username: email.split('@')[0],
+      expiresAtMs: Date.now() + 3_600_000,
+    })),
     ...overrides,
   }
 }
@@ -19,6 +39,8 @@ export function createFakeGateway(overrides: Partial<ScoreGateway> = {}): ScoreG
 export function createServices(overrides: Partial<AppServices> = {}): AppServices {
   return {
     scoreGateway: createFakeGateway(),
+    authGateway: createFakeAuthGateway(),
+    sessionStore: createMemorySessionStore(),
     beeper: { unlock: vi.fn(), beep: vi.fn() },
     questionGenerator: new QuestionGenerator(),
     now: () => Date.now(),

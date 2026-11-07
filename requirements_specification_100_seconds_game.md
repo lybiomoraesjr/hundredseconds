@@ -297,3 +297,14 @@ Cada parte termina com testes passando e um commit.
 | `404` | `USER_NOT_FOUND` | Token de um usuário que não existe mais |
 | `409` | `EMAIL_ALREADY_IN_USE` / `USERNAME_ALREADY_IN_USE` / `CONFLICT` | Cadastro duplicado |
 | `422` | `IMPLAUSIBLE_SCORE` | Pontuação fora do limite humano (anti-fraude) |
+
+---
+
+## 13. Integração Frontend ↔ Backend (detalhes de implementação)
+
+* **Desenvolvimento local:** o Vite encaminha `/api` para o backend (proxy), usando a porta `SERVER_PORT` do `.env` da raiz. Em produção a URL pode ser definida com `VITE_API_BASE_URL` (vazio = mesma origem).
+* **Sessão:** após o login o token JWT fica no `localStorage` e é descartado automaticamente quando expira ou quando a API responde `401`. O cadastro já faz o login em seguida.
+* **Jogador logado:** resultados, recorde pessoal e "Os seus resultados" vêm da API. Se a API falhar ao salvar, o resultado é guardado no navegador e o jogador é avisado.
+* **Convidado:** o resultado é sempre salvo no navegador (recorde pessoal e "Os seus resultados"). Na tela de resultado ele pode **informar um nome** para publicar a partida no ranking global (o último nome digitado é lembrado). Os números globais (Hoje/Ano e abas Dia/Semana/Ano) vêm da API.
+* **Sem conexão:** a tela inicial mostra os números conhecidos pelo navegador e o jogo continua funcionando.
+* **Mensagens de erro:** o campo `code` das respostas de erro é traduzido para português no frontend.

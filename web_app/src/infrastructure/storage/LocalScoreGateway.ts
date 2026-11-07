@@ -18,7 +18,7 @@ const WEEK_DAYS = 7
  * Keeps the matches in the browser (localStorage). Used for guests and while the API is not connected.
  * Storage failures (private mode, blocked storage) never break the game.
  */
-export class LocalScoreGateway implements ScoreGateway {
+export class LocalScoreGateway implements Omit<ScoreGateway, 'submitGuestScore'> {
   private readonly storage: Pick<Storage, 'getItem' | 'setItem'> | null
   private readonly now: () => Date
   private readonly playerName: string

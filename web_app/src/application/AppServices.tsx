@@ -1,11 +1,15 @@
 import { createContext, use, type ReactNode } from 'react'
 import { QuestionGenerator } from '../domain'
+import type { SessionStore } from './auth/SessionStore'
+import type { AuthGateway } from './ports/AuthGateway'
 import type { Beeper } from './ports/Beeper'
 import type { ScoreGateway } from './ports/ScoreGateway'
 
 /** Dependencies injected into the UI, replaceable in tests. */
 export interface AppServices {
   readonly scoreGateway: ScoreGateway
+  readonly authGateway: AuthGateway
+  readonly sessionStore: SessionStore
   readonly beeper: Beeper
   readonly questionGenerator: QuestionGenerator
   /** Current time in milliseconds, like Date.now. */

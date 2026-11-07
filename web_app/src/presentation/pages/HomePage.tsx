@@ -3,6 +3,7 @@ import type { ScoreSummary } from '../../application/ports/ScoreGateway'
 import { GameMode } from '../../domain'
 import { GameBoard } from '../components/GameBoard'
 import { ScoreSummaryPanel } from '../components/ScoreSummaryPanel'
+import { UserMenu } from '../components/UserMenu'
 import { messages } from '../i18n/messages'
 
 interface HomePageProps {
@@ -11,11 +12,15 @@ interface HomePageProps {
   onModeChange: (mode: GameMode) => void
   onStart: () => void
   onOpenHighscores: () => void
+  onOpenLogin: () => void
 }
 
-export function HomePage({ mode, summary, onModeChange, onStart, onOpenHighscores }: HomePageProps) {
+export function HomePage({ mode, summary, onModeChange, onStart, onOpenHighscores, onOpenLogin }: HomePageProps) {
   return (
     <GameBoard>
+      <Group justify="flex-end" mb="xs">
+        <UserMenu onLoginClick={onOpenLogin} />
+      </Group>
       <Group justify="space-between" align="flex-start" gap="md">
         <Stack gap={4} maw={420}>
           <Title order={1} c="white">{messages.appTitle}</Title>
