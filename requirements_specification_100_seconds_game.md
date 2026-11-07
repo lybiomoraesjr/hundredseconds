@@ -277,3 +277,21 @@ Todos os serviços serão executados via **Docker Compose**:
 | **7** | Containerização final e E2E | Dockerfiles de `api` e `web_app`, compose completo, testes Playwright |
 
 Cada parte termina com testes passando e um commit.
+
+---
+
+## 12. Contrato da API (detalhes de implementação)
+
+* **Autenticação:** `Authorization: Bearer <token>` (JWT HS256, validade padrão de 24h, `sub` = id do usuário). Os endpoints de pontuação são públicos; quando um token válido é enviado, o jogador é identificado. Um token inválido ou expirado resulta em `401`.
+* **Respostas de `POST /api/auth/login`:** `{ "accessToken", "tokenType": "Bearer", "userId", "username" }`.
+* **Erros:** formato *Problem Details* (RFC 9457) com a propriedade extra `code`, que o frontend traduz para mensagens em português. Erros de validação trazem também `errors` (campo → mensagem).
+
+| HTTP | `code` | Quando |
+| :--- | :--- | :--- |
+| `400` | `VALIDATION_ERROR` | Corpo inválido, campo obrigatório ausente, modo/período desconhecido |
+| `400` | `INVALID_PLAYER_NAME` / `INVALID_EMAIL` / `INVALID_PASSWORD` | Regras de domínio violadas (ex: convidado sem nome) |
+| `401` | `INVALID_CREDENTIALS` | E-mail ou senha incorretos |
+| `401` | `AUTHENTICATION_REQUIRED` | Aba "Os seus resultados" (`period=USER`) sem login |
+| `404` | `USER_NOT_FOUND` | Token de um usuário que não existe mais |
+| `409` | `EMAIL_ALREADY_IN_USE` / `USERNAME_ALREADY_IN_USE` / `CONFLICT` | Cadastro duplicado |
+| `422` | `IMPLAUSIBLE_SCORE` | Pontuação fora do limite humano (anti-fraude) |
