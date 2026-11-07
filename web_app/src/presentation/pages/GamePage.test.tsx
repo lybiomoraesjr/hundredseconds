@@ -1,0 +1,117 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { GameMode } from '../../domain'
+import { advanceTime, answerFromLabel, createServices, renderWithProviders } from '../../test/renderWithProviders'
+import { GamePage } from './GamePage'
+
+const advance = advanceTime
+
+const currentAnswer = () => answerFromLabel(screen.getByRole('math').getAttribute('aria-label')!)
+
+function setup(mode: GameMode = GameMode.ROOT_EXTRACTION) {
+  const onFinished = vi.fn()
+  const services = createServices()
+  renderWithProviders(<GamePage mode={mode} personalBest={50} onFinished={onFinished} />, services)
+  const user = userEvent.setup({ delay: null })
+  return { onFinished, services, user }
+}
+
+async function skipCountdown() {
+  await advance(3000)
+  // First timer tick
+  await advance(100)
+}
+
+describe('GamePage', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: false })
+  })
+
+  it('shows the 3-2-1 countdown before the first question', async () => {
+    setup()
+    expect(screen.getByText('3')).toBeInTheDocument()
+    await advance(1000)
+    expect(screen.getByText('2')).toBeInTheDocument()
+    await advance(1000)
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.queryByRole('math')).not.toBeInTheDocument()
+
+    await advance(1100)
+    expect(screen.getByRole('math')).toBeInTheDocument()
+    expect(screen.getByText('Tempo: 100')).toBeInTheDocument()
+    expect(screen.getByText('Resultado mais alto: 50')).toBeInTheDocument()
+  })
+
+  it('keeps the focus on the answer box and scores correct answers with Enter', async () => {
+    const { user } = setup()
+    await skipCountdown()
+    const input = screen.getByLabelText('Sua resposta')
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('inputmode', 'numeric')
+
+    await user.type(input, `${currentAnswer()}{Enter}`)
+
+    expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+    expect(input).toHaveValue('')
+    expect(input).toHaveFocus()
+  })
+
+  it('scores with the "Respondida" button too', async () => {
+    const { user } = setup()
+    await skipCountdown()
+    await user.type(screen.getByLabelText('Sua resposta'), String(currentAnswer()))
+    await user.click(screen.getByRole('button', { name: 'Respondida' }))
+    expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+  })
+
+  it('shows a red border after the first mistake and reveals the answer after the second', async () => {
+    const { user } = setup()
+    await skipCountdown()
+    const answer = currentAnswer()
+    const label = screen.getByRole('math').getAttribute('aria-label')
+
+    await user.type(screen.getByLabelText('Sua resposta'), `${answer + 1}{Enter}`)
+    const input = screen.getByLabelText('Sua resposta')
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(input).toHaveValue('')
+    expect(screen.getByText('Errou! Tente mais uma vez.')).toBeInTheDocument()
+
+    await user.type(input, `${answer + 2}{Enter}`)
+    const reveal = screen.getByRole('alert')
+    expect(reveal).toHaveTextContent(`= ${answer}`)
+    expect(screen.queryByLabelText('Sua resposta')).not.toBeInTheDocument()
+
+    await advance(1000)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Sua resposta')).toBeInTheDocument()
+    expect(screen.getByRole('math').getAttribute('aria-label')).not.toBe(label)
+    expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 0')
+  })
+
+  it('ignores letters typed in the answer box', async () => {
+    const { user } = setup()
+    await skipCountdown()
+    const input = screen.getByLabelText('Sua resposta')
+    await user.type(input, 'a1b2')
+    expect(input).toHaveValue('12')
+  })
+
+  it('beeps once at 10 seconds left and reports the match at the end', async () => {
+    const { user, services, onFinished } = setup(GameMode.EXPONENTIATION)
+    await skipCountdown()
+    await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer()}{Enter}`)
+    await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer() + 1}{Enter}`)
+
+    await advance(89_000)
+    expect(services.beeper.beep).not.toHaveBeenCalled()
+    await advance(1_000)
+    expect(screen.getByText('Tempo: 10')).toBeInTheDocument()
+    expect(services.beeper.beep).toHaveBeenCalledTimes(1)
+
+    await advance(10_000)
+    expect(services.beeper.beep).toHaveBeenCalledTimes(1)
+    expect(onFinished).toHaveBeenCalledTimes(1)
+    expect(onFinished).toHaveBeenCalledWith({ mode: GameMode.EXPONENTIATION, score: 1, wrongAnswers: 1 })
+  })
+})

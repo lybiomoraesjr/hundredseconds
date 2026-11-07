@@ -1,0 +1,50 @@
+.expression {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.exponent {
+  font-size: 0.55em;
+  vertical-align: 0.9em;
+  margin-left: 0.04em;
+}
+
+/* Root drawn with SVG so the radical sign always joins the bar over the radicand */
+.root {
+  display: inline-flex;
+  align-items: stretch;
+  position: relative;
+  vertical-align: middle;
+}
+
+.withIndex {
+  padding-left: 0.12em;
+}
+
+.rootIndex {
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  font-size: 0.42em;
+  line-height: 1;
+}
+
+.radicalSign {
+  width: 0.55em;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.radicalSign path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.075em;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.radicand {
+  border-top: 0.075em solid currentColor;
+  padding: 0.1em 0.08em 0.02em 0.04em;
+}

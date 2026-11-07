@@ -1,0 +1,24 @@
+.bar {
+  background: var(--mantine-color-dark-7);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  display: flex;
+  justify-content: center;
+  gap: min(6px, 1vw);
+}
+
+.star {
+  width: min(28px, 7.2vw);
+  height: min(28px, 7.2vw);
+  transition: transform 200ms ease;
+}
+
+.filled {
+  fill: var(--mantine-color-yellow-5);
+  stroke: var(--mantine-color-yellow-6);
+  transform: scale(1.1);
+}
+
+.empty {
+  fill: var(--mantine-color-white);
+  stroke: var(--mantine-color-gray-5);
+}
