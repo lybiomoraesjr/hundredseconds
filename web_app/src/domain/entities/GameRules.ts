@@ -5,7 +5,7 @@ export const GameRules = {
   /** Attempts per question before the answer is revealed. */
   MAX_ATTEMPTS: 2,
   REVEAL_DURATION_MS: 1000,
-  /** Beep on every second while remaining time is at or below this value. */
+  /** A single beep plays when the remaining time reaches this value. */
   WARNING_SECONDS: 10,
   ANSWERS_PER_STAR: 10,
   MAX_STARS: 10,

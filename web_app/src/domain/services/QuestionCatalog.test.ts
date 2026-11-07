@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DifficultyLevel } from '../entities/DifficultyLevel'
 import { GameMode } from '../entities/GameMode'
-import { questionsFor } from './QuestionCatalog'
+import { questionsBelow, questionsFor } from './QuestionCatalog'
 
 const ids = (mode: GameMode, level: DifficultyLevel) => questionsFor(mode, level).map((q) => q.id)
 
@@ -28,9 +28,19 @@ describe('QuestionCatalog', () => {
     expect(new Set(list).size).toBe(list.length)
   })
 
-  it('never asks 0^0', () => {
-    const all = Object.values(DifficultyLevel).flatMap((level) => ids(GameMode.EXPONENTIATION, level))
-    expect(all).not.toContain('pow:0^0')
+  it('includes 0^0 = 1 in the easy level', () => {
+    const zeroToZero = questionsFor(GameMode.EXPONENTIATION, DifficultyLevel.EASY).find((q) => q.id === 'pow:0^0')
+    expect(zeroToZero?.answer).toBe(1)
+  })
+
+  it('lists the questions of the lower levels', () => {
+    const easy = ids(GameMode.ROOT_EXTRACTION, DifficultyLevel.EASY)
+    const medium = ids(GameMode.ROOT_EXTRACTION, DifficultyLevel.MEDIUM)
+    const below = (level: DifficultyLevel) => questionsBelow(GameMode.ROOT_EXTRACTION, level).map((q) => q.id)
+
+    expect(below(DifficultyLevel.EASY)).toEqual([])
+    expect(below(DifficultyLevel.MEDIUM)).toEqual(easy)
+    expect(below(DifficultyLevel.ADVANCED)).toEqual([...easy, ...medium])
   })
 
   it('follows the easy level of the specification', () => {

@@ -14,7 +14,10 @@ export function remainingFraction(startedAtMs: number, nowMs: number,
   return Math.max(0, 1 - elapsedMs / (durationSeconds * 1000))
 }
 
-/** Beep on each of the last seconds (10 down to 0). */
-export function shouldBeep(secondsLeft: number): boolean {
-  return secondsLeft >= 0 && secondsLeft <= GameRules.WARNING_SECONDS
+/**
+ * True only on the tick where the remaining time reaches the warning threshold, so the beep plays once.
+ * Comparing with the previous tick keeps it working even if a tick is skipped.
+ */
+export function shouldPlayWarning(previousSecondsLeft: number, secondsLeft: number): boolean {
+  return previousSecondsLeft > GameRules.WARNING_SECONDS && secondsLeft <= GameRules.WARNING_SECONDS
 }

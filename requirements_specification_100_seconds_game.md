@@ -34,7 +34,7 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
 * **Contagem Regressiva Inicial:** Ao clicar em "Início", a tela limpa e exibe uma contagem regressiva centralizada ($3, 2, 1$) antes de liberar a primeira questão e iniciar o cronômetro.
 * **Duração:** A partida dura exatamente $100$ segundos.
 * **Barra de Progresso:** Uma barra superior verde diminui proporcionalmente ao tempo restante, acompanhada do texto `Tempo: X`.
-* **Alerta Sonoro:** Nos últimos $10$ segundos (do segundo $10$ ao $0$), o sistema deve emitir um sinal sonoro (*beep* a cada segundo) indicando que o tempo está acabando.
+* **Alerta Sonoro:** Quando faltarem $10$ segundos, o sistema deve emitir **um único** sinal sonoro (*beep*) indicando que o tempo está acabando.
 * **Submissão de Resposta:** 
   * O foco do cursor (*autofocus*) deve permanecer sempre na caixa de texto central.
   * O jogador digita os números no teclado e pressiona a tecla `Enter` (ou clica no botão "Respondida") para submeter.
@@ -56,7 +56,7 @@ O gerador de questões deve se basear na pontuação atual (`score`) da partida 
 #### Nível 1: Fácil (De $0$ a $25$ acertos)
 * **Potenciação:** 
   * Bases $0, 1$ e $10$ com expoentes simples (ex: $0^2, 1^4, 10^2, 10^3$).
-  * Qualquer base de $1$ a $10$ elevada a $0$ ou $1$ (ex: $7^0 = 1$, $9^1 = 9$).
+  * Qualquer base de $0$ a $10$ elevada a $0$ ou $1$ (ex: $0^0 = 1$, $7^0 = 1$, $9^1 = 9$).
   * Quadrados perfeitos básicos de $2^2$ até $5^2$.
 * **Radiciação:**
   * Raízes quadradas exatas iniciais: $\sqrt{0}, \sqrt{1}, \sqrt{4}, \sqrt{9}, \sqrt{16}, \sqrt{25}$ e $\sqrt{100}$.
@@ -82,7 +82,9 @@ O gerador de questões deve se basear na pontuação atual (`score`) da partida 
   * Raízes cúbicas de $\sqrt[3]{216}$ até $\sqrt[3]{729}$.
   * Raízes quartas e quintas adicionais: $\sqrt[4]{81}, \sqrt[4]{256}, \sqrt[5]{243}$.
 
-*(Regra adicional de sorteio: Evitar que a mesma pergunta apareça duas vezes consecutivas).*
+*(Regras adicionais de sorteio:)*
+* Evitar que a mesma pergunta apareça duas vezes consecutivas.
+* **Níveis cumulativos:** nos níveis mais elevados também podem aparecer questões dos níveis anteriores. Para manter a progressão, a questão é sorteada do **nível atual com $70\%$ de chance** e dos **níveis anteriores com $30\%$** (no Nível 1 sempre do próprio nível).
 
 ---
 

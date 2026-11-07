@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { remainingFraction, remainingSeconds, shouldBeep } from './GameTimer'
+import { remainingFraction, remainingSeconds, shouldPlayWarning } from './GameTimer'
 
 describe('GameTimer', () => {
   const start = 1_000_000
@@ -20,10 +20,14 @@ describe('GameTimer', () => {
     expect(remainingFraction(start, start + 200_000)).toBe(0)
   })
 
-  it('beeps only during the last ten seconds', () => {
-    expect(shouldBeep(11)).toBe(false)
-    expect(shouldBeep(10)).toBe(true)
-    expect(shouldBeep(1)).toBe(true)
-    expect(shouldBeep(0)).toBe(true)
+  it('plays the warning only once, when reaching ten seconds left', () => {
+    const ticks = [100, 50, 12, 11, 10, 9, 5, 1, 0]
+    const warnings = ticks.slice(1).filter((seconds, index) => shouldPlayWarning(ticks[index], seconds))
+    expect(warnings).toEqual([10])
+  })
+
+  it('still plays the warning when the tick at ten seconds is skipped', () => {
+    expect(shouldPlayWarning(11, 9)).toBe(true)
+    expect(shouldPlayWarning(10, 9)).toBe(false)
   })
 })

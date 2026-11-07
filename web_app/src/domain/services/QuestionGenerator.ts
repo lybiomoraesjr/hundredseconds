@@ -1,10 +1,13 @@
 import type { GameMode } from '../entities/GameMode'
 import type { Question } from '../entities/Question'
 import { resolveDifficultyLevel } from './DifficultyLevelResolver'
-import { questionsFor } from './QuestionCatalog'
+import { questionsBelow, questionsFor } from './QuestionCatalog'
 
 /** Returns a number in [0, 1), like Math.random. Injected to make tests deterministic. */
 export type RandomSource = () => number
+
+/** Chance of drawing from the current level; the rest comes from the lower levels. */
+export const CURRENT_LEVEL_PROBABILITY = 0.7
 
 export class QuestionGenerator {
   private readonly random: RandomSource
@@ -15,12 +18,19 @@ export class QuestionGenerator {
 
   /**
    * Draws a question for the current score, never repeating the previous one.
+   * Higher levels may also bring back questions from the lower levels.
    */
   next(mode: GameMode, score: number, previous?: Question): Question {
-    const all = questionsFor(mode, resolveDifficultyLevel(score))
-    const candidates = previous ? all.filter((question) => question.id !== previous.id) : all
-    // A level always has more than one question, but stay safe
-    const pool = candidates.length > 0 ? candidates : all
+    const level = resolveDifficultyLevel(score)
+    const lower = questionsBelow(mode, level)
+    const fromLowerLevels = lower.length > 0 && this.random() >= CURRENT_LEVEL_PROBABILITY
+    return this.pick(fromLowerLevels ? lower : questionsFor(mode, level), previous)
+  }
+
+  private pick(questions: readonly Question[], previous?: Question): Question {
+    const candidates = previous ? questions.filter((question) => question.id !== previous.id) : questions
+    // Every pool has more than one question, but stay safe
+    const pool = candidates.length > 0 ? candidates : questions
     const index = Math.min(pool.length - 1, Math.floor(this.random() * pool.length))
     return pool[index]
   }
