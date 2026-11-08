@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { DifficultyLevel } from '../entities/DifficultyLevel'
-import { GameMode } from '../entities/GameMode'
+import { GameMode, type MathGameMode } from '../entities/GameMode'
 import { questionsBelow, questionsFor } from './QuestionCatalog'
 import { CURRENT_LEVEL_PROBABILITY, QuestionGenerator } from './QuestionGenerator'
 
-const idsOf = (mode: GameMode, level: DifficultyLevel) => questionsFor(mode, level).map((q) => q.id)
+const idsOf = (mode: MathGameMode, level: DifficultyLevel) => questionsFor(mode, level).map((q) => q.id)
 
 /** Returns the given values in order, then repeats the last one. */
 const sequence = (...values: number[]) => {

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { DifficultyLevel } from '../entities/DifficultyLevel'
-import { GameMode } from '../entities/GameMode'
+import { GameMode, isMathMode, type MathGameMode } from '../entities/GameMode'
 import { questionsBelow, questionsFor } from './QuestionCatalog'
 
-const ids = (mode: GameMode, level: DifficultyLevel) => questionsFor(mode, level).map((q) => q.id)
+const ids = (mode: MathGameMode, level: DifficultyLevel) => questionsFor(mode, level).map((q) => q.id)
 
 describe('QuestionCatalog', () => {
-  const allCombinations = Object.values(GameMode).flatMap((mode) =>
+  const allCombinations = Object.values(GameMode).filter(isMathMode).flatMap((mode) =>
     Object.values(DifficultyLevel).map((level) => [mode, level] as const))
 
   it.each(allCombinations)('%s / %s has correct, mode-consistent answers', (mode, level) => {

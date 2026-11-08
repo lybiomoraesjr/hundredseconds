@@ -1,7 +1,7 @@
-import type { GameMode } from '../entities/GameMode'
+import { GameMode, isMathMode, type MathGameMode } from '../entities/GameMode'
 import type { Question } from '../entities/Question'
 import { resolveDifficultyLevel } from './DifficultyLevelResolver'
-import { questionsBelow, questionsFor } from './QuestionCatalog'
+import { FLAG_QUESTIONS, questionsBelow, questionsFor } from './QuestionCatalog'
 
 /** Returns a number in [0, 1), like Math.random. Injected to make tests deterministic. */
 export type RandomSource = () => number
@@ -17,17 +17,27 @@ export class QuestionGenerator {
   }
 
   /**
-   * Draws a question for the current score, never repeating the previous one.
-   * Higher levels may also bring back questions from the lower levels.
+   * Draws the next question, never repeating the previous one.
+   * - Math: based on the current score; higher levels may also bring back questions from the lower levels.
+   * - Flags: no flag repeats until every flag was shown (usedIds holds the ids already shown in the current round).
    */
-  next(mode: GameMode, score: number, previous?: Question): Question {
+  next(mode: GameMode, score: number, previous?: Question, usedIds: readonly string[] = []): Question {
+    if (isMathMode(mode)) {
+      return this.nextMath(mode, score, previous)
+    }
+    const unused = FLAG_QUESTIONS.filter((question) => !usedIds.includes(question.id))
+    // Every flag was shown: a new round starts with all of them again
+    return this.pick(unused.length > 0 ? unused : FLAG_QUESTIONS, previous)
+  }
+
+  private nextMath(mode: MathGameMode, score: number, previous?: Question): Question {
     const level = resolveDifficultyLevel(score)
     const lower = questionsBelow(mode, level)
     const fromLowerLevels = lower.length > 0 && this.random() >= CURRENT_LEVEL_PROBABILITY
     return this.pick(fromLowerLevels ? lower : questionsFor(mode, level), previous)
   }
 
-  private pick(questions: readonly Question[], previous?: Question): Question {
+  private pick<T extends Question>(questions: readonly T[], previous?: Question): T {
     const candidates = previous ? questions.filter((question) => question.id !== previous.id) : questions
     // Every pool has more than one question, but stay safe
     const pool = candidates.length > 0 ? candidates : questions

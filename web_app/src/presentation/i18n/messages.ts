@@ -7,6 +7,7 @@ export const messages = {
   modes: {
     [GameMode.EXPONENTIATION]: 'Potenciação',
     [GameMode.ROOT_EXTRACTION]: 'Radiciação',
+    [GameMode.STATE_FLAGS]: 'Bandeiras',
   },
   modeSelectorLabel: 'Modalidade',
   summary: {
@@ -25,6 +26,10 @@ export const messages = {
     submit: 'Respondida',
     tryAgain: 'Errou! Tente mais uma vez.',
     correctAnswerWas: 'A resposta correta é',
+    flagQuestion: 'De qual estado é esta bandeira?',
+    // Must not reveal the answer
+    flagAlt: 'Bandeira de um estado brasileiro',
+    flagAnswerPlaceholder: 'Nome do estado',
     starsLabel: (stars: number) => `${stars} de 10 estrelas`,
   },
   result: {

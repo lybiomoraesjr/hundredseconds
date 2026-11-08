@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { GameMode } from '../../domain'
+import { BRAZILIAN_STATES, GameMode } from '../../domain'
 import { advanceTime, answerFromLabel, createServices, renderWithProviders } from '../../test/renderWithProviders'
 import { GamePage } from './GamePage'
 
@@ -144,5 +144,42 @@ describe('GamePage', () => {
     expect(services.beeper.warning).toHaveBeenCalledTimes(1)
     expect(onFinished).toHaveBeenCalledTimes(1)
     expect(onFinished).toHaveBeenCalledWith({ mode: GameMode.EXPONENTIATION, score: 1, wrongAnswers: 1 })
+  })
+
+  describe('flags', () => {
+    const flag = () => screen.getByRole('img', { name: 'Bandeira de um estado brasileiro' })
+    const currentState = () => BRAZILIAN_STATES.find((state) => state.code === flag().getAttribute('data-state'))!
+
+    it('shows a flag and accepts the state name without accents', async () => {
+      const { user } = setup(GameMode.STATE_FLAGS)
+      await skipCountdown()
+      expect(screen.getByText('De qual estado é esta bandeira?')).toBeInTheDocument()
+      expect(flag()).toHaveAttribute('src', `/flags/${currentState().code}.webp`)
+      const input = screen.getByLabelText('Sua resposta')
+      expect(input).toHaveAttribute('inputmode', 'text')
+
+      const typed = currentState().name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
+      await user.type(input, `${typed}{Enter}`)
+
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+      expect(input).toHaveValue('')
+    })
+
+    it('reveals the state name after the first mistake and moves to another flag', async () => {
+      const { user } = setup(GameMode.STATE_FLAGS)
+      await skipCountdown()
+      const state = currentState()
+
+      await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
+
+      expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.name)
+      expect(screen.queryByLabelText('Sua resposta')).not.toBeInTheDocument()
+      await advance(1000)
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+      await advance(500)
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(currentState().code).not.toBe(state.code)
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 0')
+    })
   })
 })

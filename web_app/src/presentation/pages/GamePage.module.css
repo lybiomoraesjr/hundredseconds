@@ -20,6 +20,13 @@
   font-weight: 700;
 }
 
+/* Flags: the answer is a state name, so the box is wider and the text smaller */
+.textAnswer input {
+  width: min(20rem, 70vw);
+  height: 4rem;
+  font-size: 1.5rem;
+}
+
 .shake {
   animation: shake 400ms ease-in-out;
 }
@@ -51,8 +58,21 @@
   font-weight: 800;
 }
 
+.revealName {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .shake {
+  /* Flags: the answer is a state name, so the box is wider and the text smaller */
+.textAnswer input {
+  width: min(20rem, 70vw);
+  height: 4rem;
+  font-size: 1.5rem;
+}
+
+.shake {
     animation: none;
   }
 }

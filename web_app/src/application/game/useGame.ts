@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
-import { GameRules, shouldPlayWarning, starsFor, type GameMode } from '../../domain'
+import { revealDurationFor, shouldPlayWarning, starsFor, type GameMode } from '../../domain'
 import { useAppServices } from '../AppServices'
 import type { FinishedMatch } from '../ports/ScoreGateway'
 import { createGameReducer, createInitialGameState } from './gameReducer'
@@ -50,13 +50,13 @@ export function useGame(mode: GameMode, onFinished: (match: FinishedMatch) => vo
     return () => clearInterval(interval)
   }, [status, now])
 
-  // Correct answer stays on screen for one second after the second mistake.
-  // The game clock keeps running meanwhile, so the player really loses that second.
+  // Correct answer stays on screen for a moment after the last mistake.
+  // The game clock keeps running meanwhile, so the player really loses that time.
   useEffect(() => {
     if (phase !== 'REVEALING_ANSWER' || status !== 'PLAYING') return
-    const timeout = setTimeout(() => dispatch({ type: 'FINISH_REVEAL' }), GameRules.REVEAL_DURATION_MS)
+    const timeout = setTimeout(() => dispatch({ type: 'FINISH_REVEAL' }), revealDurationFor(mode))
     return () => clearTimeout(timeout)
-  }, [phase, status, state.session.wrongAnswers])
+  }, [phase, status, state.session.wrongAnswers, mode])
 
   // Single warning beep at 10 seconds left
   const previousSecondsLeft = useRef(secondsLeft)

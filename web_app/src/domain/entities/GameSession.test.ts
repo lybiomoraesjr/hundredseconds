@@ -6,7 +6,7 @@ import { finishReveal, startSession, starsOf, submitAnswer, type GameSession } f
 const generator = new QuestionGenerator()
 
 const answerOf = (session: GameSession) => String(session.currentQuestion.answer)
-const wrongAnswerOf = (session: GameSession) => String(session.currentQuestion.answer + 1)
+const wrongAnswerOf = (session: GameSession) => String(Number(session.currentQuestion.answer) + 1)
 
 describe('GameSession', () => {
   it('starts with zero score, zero mistakes and the first attempt', () => {
@@ -88,5 +88,48 @@ describe('GameSession', () => {
     }
     expect(session.score).toBe(23)
     expect(starsOf(session)).toBe(2)
+  })
+})
+
+describe('GameSession with flags', () => {
+  it('reveals the answer right after the first mistake', () => {
+    const session = startSession(GameMode.STATE_FLAGS, generator)
+    const { session: next, outcome } = submitAnswer(session, 'Atlântida', generator)
+    expect(outcome).toBe('WRONG_REVEAL')
+    expect(next.phase).toBe('REVEALING_ANSWER')
+    expect(next.wrongAnswers).toBe(1)
+  })
+
+  it('accepts the state name without accents', () => {
+    const session = startSession(GameMode.STATE_FLAGS, generator)
+    const typed = String(session.currentQuestion.answer).normalize('NFD').replace(/\p{Diacritic}/gu, '').toUpperCase()
+    const { session: next, outcome } = submitAnswer(session, typed, generator)
+    expect(outcome).toBe('CORRECT')
+    expect(next.score).toBe(1)
+  })
+
+  it('goes through the 27 flags before starting a new round', () => {
+    let session = startSession(GameMode.STATE_FLAGS, generator)
+    const shown = [session.currentQuestion.id]
+    for (let i = 1; i < 27; i++) {
+      session = submitAnswer(session, answerOf(session), generator).session
+      shown.push(session.currentQuestion.id)
+    }
+    expect(new Set(shown).size).toBe(27)
+    expect(session.usedQuestionIds).toHaveLength(27)
+
+    const lastOfRound = session.currentQuestion.id
+    session = submitAnswer(session, answerOf(session), generator).session
+    expect(session.currentQuestion.id).not.toBe(lastOfRound)
+    expect(session.usedQuestionIds).toEqual([session.currentQuestion.id])
+  })
+
+  it('keeps the round going after a revealed answer', () => {
+    let session = startSession(GameMode.STATE_FLAGS, generator)
+    const first = session.currentQuestion.id
+    session = submitAnswer(session, 'errado', generator).session
+    session = finishReveal(session, generator)
+    expect(session.currentQuestion.id).not.toBe(first)
+    expect(session.usedQuestionIds).toEqual([first, session.currentQuestion.id])
   })
 })

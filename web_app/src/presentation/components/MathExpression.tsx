@@ -1,9 +1,9 @@
-import { GameMode, type Question } from '../../domain'
+import { GameMode, type MathQuestion } from '../../domain'
 import { messages } from '../i18n/messages'
 import classes from './MathExpression.module.css'
 
 /** Renders a^n with <sup> and roots with a visible index and radicand (RNF04). */
-export function MathExpression({ question }: { question: Question }) {
+export function MathExpression({ question }: { question: MathQuestion }) {
   if (question.mode === GameMode.EXPONENTIATION) {
     return (
       <span className={classes.expression} role="math" aria-label={messages.math.power(question.operand, question.degree)}>

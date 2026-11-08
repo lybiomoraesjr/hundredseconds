@@ -9,7 +9,7 @@ const START = 1_000_000
 const playing = (): GameState =>
   reduce(createInitialGameState(GameMode.EXPONENTIATION, generator), { type: 'START_PLAYING', nowMs: START })
 
-const wrong = (state: GameState) => String(state.session.currentQuestion.answer + 1)
+const wrong = (state: GameState) => String(Number(state.session.currentQuestion.answer) + 1)
 const right = (state: GameState) => String(state.session.currentQuestion.answer)
 
 describe('gameReducer', () => {

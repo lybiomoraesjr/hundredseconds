@@ -2,9 +2,11 @@ import { Button, Center, Group, Stack, Text, TextInput } from '@mantine/core'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useGame } from '../../application/game/useGame'
 import type { FinishedMatch } from '../../application/ports/ScoreGateway'
-import type { GameMode } from '../../domain'
+import { GameMode, type Question } from '../../domain'
+import { preloadFlags } from '../components/flagImages'
 import { GameBoard } from '../components/GameBoard'
 import { MathExpression } from '../components/MathExpression'
+import { StateFlag } from '../components/StateFlag'
 import { StarBar } from '../components/StarBar'
 import { TimerBar } from '../components/TimerBar'
 import { messages } from '../i18n/messages'
@@ -25,6 +27,12 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
   const isRevealing = session.phase === 'REVEALING_ANSWER'
   const isRetry = state.lastOutcome === 'WRONG_RETRY'
   const best = Math.max(personalBest ?? 0, session.score)
+  const isFlagGame = mode === GameMode.STATE_FLAGS
+
+  // Flags are downloaded during the countdown, so none of them pops in late
+  useEffect(() => {
+    if (isFlagGame) preloadFlags()
+  }, [isFlagGame])
 
   // Keep the cursor in the answer box all the time
   useEffect(() => {
@@ -59,9 +67,7 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
       </Group>
 
       <Stack align="center" justify="center" gap="lg" flex={1} py="xl">
-        <Text component="div" className={classes.expression} c="white" data-testid="question">
-          <MathExpression question={session.currentQuestion} /> =
-        </Text>
+        <QuestionPrompt question={session.currentQuestion} />
 
         {!isRevealing && (
           <form onSubmit={handleSubmit}>
@@ -69,16 +75,21 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
               <TextInput
                 key={state.mistakeCount}
                 ref={inputRef}
-                className={`${classes.answerInput} ${isRetry ? classes.shake : ''}`}
+                className={`${classes.answerInput} ${isFlagGame ? classes.textAnswer : ''} ${isRetry ? classes.shake : ''}`}
                 aria-label={messages.game.answerLabel}
                 value={answer}
                 onChange={(event) => {
-                  setAnswer(event.currentTarget.value.replace(/\D/g, ''))
+                  const value = event.currentTarget.value
+                  setAnswer(isFlagGame ? value : value.replace(/\D/g, ''))
                   clearFeedback()
                 }}
                 error={isRetry}
-                inputMode="numeric"
+                inputMode={isFlagGame ? 'text' : 'numeric'}
+                placeholder={isFlagGame ? messages.game.flagAnswerPlaceholder : undefined}
                 autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
                 autoFocus
                 disabled={status !== 'PLAYING'}
                 styles={isRetry ? { input: { borderWidth: 4 } } : undefined}
@@ -95,11 +106,41 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
       {isRevealing && (
         <div className={classes.reveal} role="alert">
           <Text size="xl" fw={600}>{messages.game.correctAnswerWas}</Text>
-          <div className={classes.revealExpression}>
-            <MathExpression question={session.currentQuestion} /> = {session.currentQuestion.answer}
-          </div>
+          <RevealedAnswer question={session.currentQuestion} />
         </div>
       )}
     </GameBoard>
+  )
+}
+
+function QuestionPrompt({ question }: { question: Question }) {
+  if (question.mode === GameMode.STATE_FLAGS) {
+    return (
+      <Stack align="center" gap="sm" data-testid="question">
+        <Text c="white" fw={600} size="lg">{messages.game.flagQuestion}</Text>
+        <StateFlag stateCode={question.stateCode} />
+      </Stack>
+    )
+  }
+  return (
+    <Text component="div" className={classes.expression} c="white" data-testid="question">
+      <MathExpression question={question} /> =
+    </Text>
+  )
+}
+
+function RevealedAnswer({ question }: { question: Question }) {
+  if (question.mode === GameMode.STATE_FLAGS) {
+    return (
+      <Stack align="center" gap="md">
+        <StateFlag stateCode={question.stateCode} size="lg" />
+        <Text className={classes.revealName} data-testid="revealed-answer">{question.answer}</Text>
+      </Stack>
+    )
+  }
+  return (
+    <div className={classes.revealExpression} data-testid="revealed-answer">
+      <MathExpression question={question} /> = {question.answer}
+    </div>
   )
 }

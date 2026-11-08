@@ -47,6 +47,15 @@ class DatabaseMigrationTests {
 	}
 
 	@Test
+	void shouldAcceptStateFlagsGameMode() {
+		int inserted = jdbcTemplate.update(
+				"INSERT INTO game_scores (player_name, game_mode, score, stars_earned) VALUES (?, ?, ?, ?)",
+				"guest", "STATE_FLAGS", 27, 2);
+
+		assertThat(inserted).isEqualTo(1);
+	}
+
+	@Test
 	void shouldRejectUnknownGameMode() {
 		assertThatThrownBy(() -> jdbcTemplate.update(
 				"INSERT INTO game_scores (player_name, game_mode, score, stars_earned) VALUES (?, ?, ?, ?)",

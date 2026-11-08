@@ -5,5 +5,7 @@ package com.hundredseconds.api.domain.model;
  */
 public enum GameMode {
 	EXPONENTIATION,
-	ROOT_EXTRACTION
+	ROOT_EXTRACTION,
+	/** Guess the Brazilian state from its flag. */
+	STATE_FLAGS
 }

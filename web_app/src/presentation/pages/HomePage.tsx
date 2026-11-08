@@ -1,4 +1,4 @@
-import { Button, Group, SegmentedControl, Stack, Text, Title } from '@mantine/core'
+import { Button, Group, SegmentedControl, Stack, Text, Title, useMatches } from '@mantine/core'
 import type { ScoreSummary } from '../../application/ports/ScoreGateway'
 import { GameMode } from '../../domain'
 import { GameBoard } from '../components/GameBoard'
@@ -16,6 +16,8 @@ interface HomePageProps {
 }
 
 export function HomePage({ mode, summary, onModeChange, onStart, onOpenHighscores, onOpenLogin }: HomePageProps) {
+  // Smaller labels on phones so the three modes fit the board
+  const selectorSize = useMatches({ base: 'sm', xs: 'md' })
   return (
     <GameBoard>
       <Group justify="flex-end" mb="xs">
@@ -34,8 +36,11 @@ export function HomePage({ mode, summary, onModeChange, onStart, onOpenHighscore
           aria-label={messages.modeSelectorLabel}
           value={mode}
           onChange={(value) => onModeChange(value as GameMode)}
-          size="md"
+          size={selectorSize}
           radius="xl"
+          fullWidth
+          w="100%"
+          maw={460}
           data={Object.values(GameMode).map((value) => ({ value, label: messages.modes[value] }))}
         />
         <Button size="xl" radius="xl" color="green.6" px={56} onClick={onStart}>

@@ -1,0 +1,14 @@
+/* Fixed box with the usual 10:7 proportion, so the layout does not jump between flags */
+.flag {
+  display: block;
+  width: clamp(14rem, 60vw, 20rem);
+  aspect-ratio: 10 / 7;
+  object-fit: contain;
+  border-radius: var(--mantine-radius-sm);
+  box-shadow: var(--mantine-shadow-md);
+  user-select: none;
+}
+
+.large {
+  width: clamp(16rem, 75vw, 28rem);
+}
