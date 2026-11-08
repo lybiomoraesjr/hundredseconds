@@ -8,6 +8,7 @@ export const messages = {
     [GameMode.EXPONENTIATION]: 'Potenciação',
     [GameMode.ROOT_EXTRACTION]: 'Radiciação',
     [GameMode.STATE_FLAGS]: 'Bandeiras',
+    [GameMode.STATE_ABBREVIATIONS]: 'Siglas',
   },
   modeSelectorLabel: 'Modalidade',
   summary: {
@@ -30,6 +31,8 @@ export const messages = {
     // Must not reveal the answer
     flagAlt: 'Bandeira de um estado brasileiro',
     flagAnswerPlaceholder: 'Nome do estado',
+    abbreviationQuestion: 'Qual é a sigla deste estado?',
+    abbreviationAnswerPlaceholder: 'UF',
     starsLabel: (stars: number) => `${stars} de 10 estrelas`,
   },
   result: {

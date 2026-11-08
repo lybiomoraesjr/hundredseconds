@@ -1,4 +1,4 @@
-import { Button, Group, SegmentedControl, Stack, Text, Title, useMatches } from '@mantine/core'
+import { Button, Chip, Group, Stack, Text, Title } from '@mantine/core'
 import type { ScoreSummary } from '../../application/ports/ScoreGateway'
 import { GameMode } from '../../domain'
 import { GameBoard } from '../components/GameBoard'
@@ -16,8 +16,6 @@ interface HomePageProps {
 }
 
 export function HomePage({ mode, summary, onModeChange, onStart, onOpenHighscores, onOpenLogin }: HomePageProps) {
-  // Smaller labels on phones so the three modes fit the board
-  const selectorSize = useMatches({ base: 'sm', xs: 'md' })
   return (
     <GameBoard>
       <Group justify="flex-end" mb="xs">
@@ -32,17 +30,16 @@ export function HomePage({ mode, summary, onModeChange, onStart, onOpenHighscore
       </Group>
 
       <Stack align="center" justify="center" gap="xl" flex={1} py="xl">
-        <SegmentedControl
-          aria-label={messages.modeSelectorLabel}
-          value={mode}
-          onChange={(value) => onModeChange(value as GameMode)}
-          size={selectorSize}
-          radius="xl"
-          fullWidth
-          w="100%"
-          maw={460}
-          data={Object.values(GameMode).map((value) => ({ value, label: messages.modes[value] }))}
-        />
+        {/* Chips wrap to new lines, so new games keep fitting on small screens */}
+        <Chip.Group multiple={false} value={mode} onChange={(value) => onModeChange(value as GameMode)}>
+          <Group justify="center" gap="xs" role="radiogroup" aria-label={messages.modeSelectorLabel} maw={520}>
+            {Object.values(GameMode).map((value) => (
+              <Chip key={value} value={value} size="md" variant="filled" color="green.6">
+                {messages.modes[value]}
+              </Chip>
+            ))}
+          </Group>
+        </Chip.Group>
         <Button size="xl" radius="xl" color="green.6" px={56} onClick={onStart}>
           {messages.start}
         </Button>

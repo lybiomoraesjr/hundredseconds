@@ -24,7 +24,7 @@ O objetivo deste projeto é desenvolver uma aplicação web de perguntas e respo
 ## 2. Regras de Negócio e Mecânicas de Jogo (Game Design)
 
 ### 2.1. Modalidades de Jogo
-Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma entre três modalidades:
+Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma entre quatro modalidades (exibidas como *chips* que quebram linha em telas pequenas):
 1. **Apenas Potenciação:** Questões no formato $a^n = ?$
 2. **Apenas Radiciação:** Questões no formato $\sqrt[n]{a} = ?$
 3. **Bandeiras dos estados** (`STATE_FLAGS`): aparece a bandeira de um estado brasileiro (26 estados + DF) e o jogador digita o nome do estado. Regras próprias:
@@ -33,6 +33,7 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
    * **Uma única tentativa:** ao errar, a bandeira e o nome correto cobrem a tela por **1,5 segundo** (o cronômetro continua correndo) e a próxima bandeira aparece.
    * Duração (100 s), estrelas, contador de erros e rankings funcionam como nas outras modalidades. Não há níveis de dificuldade.
    * Imagens em `web_app/public/flags/<sigla>.webp`.
+4. **Siglas dos estados** (`STATE_ABBREVIATIONS`): aparece o nome de um estado (26 estados + DF) e o jogador digita a sigla (ex.: Minas Gerais → `MG`). Segue as mesmas regras das Bandeiras (27 por rodada sem repetição, uma única tentativa, revelação de 1,5 s com o nome e a sigla). O campo aceita apenas letras, no máximo 2, convertidas para maiúsculas.
 
 *(Nota: Os rankings e recordes devem ser registrados e exibidos separadamente para cada modalidade).*
 

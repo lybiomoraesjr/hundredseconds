@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createFlagQuestion, createPowerQuestion } from '../entities/Question'
+import { createAbbreviationQuestion, createFlagQuestion, createPowerQuestion } from '../entities/Question'
 import { checkAnswer, normalizeText } from './AnswerChecker'
 
 const saoPaulo = createFlagQuestion({ code: 'sp', name: 'São Paulo' })
@@ -42,5 +42,20 @@ describe('checkAnswer', () => {
     expect(checkAnswer(question, ' 08 ')).toBe('CORRECT')
     expect(checkAnswer(question, '9')).toBe('WRONG')
     expect(checkAnswer(question, '')).toBe('EMPTY')
+  })
+})
+
+describe('checkAnswer with abbreviations', () => {
+  const minas = createAbbreviationQuestion({ code: 'mg', name: 'Minas Gerais' })
+
+  it('accepts the abbreviation in any case', () => {
+    expect(checkAnswer(minas, 'MG')).toBe('CORRECT')
+    expect(checkAnswer(minas, 'mg')).toBe('CORRECT')
+    expect(checkAnswer(minas, ' Mg ')).toBe('CORRECT')
+  })
+
+  it('rejects other abbreviations and the state name', () => {
+    expect(checkAnswer(minas, 'MS')).toBe('WRONG')
+    expect(checkAnswer(minas, 'Minas Gerais')).toBe('WRONG')
   })
 })

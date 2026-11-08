@@ -1,5 +1,5 @@
 import type { BrazilianState } from './BrazilianState'
-import { GameMode, type MathGameMode } from './GameMode'
+import { GameMode, isStateMode, type MathGameMode, type StateGameMode } from './GameMode'
 
 /**
  * A single math question.
@@ -14,15 +14,24 @@ export interface MathQuestion {
   readonly answer: number
 }
 
-/** Shows the flag of a state; the answer is the state name. */
-export interface FlagQuestion {
+/**
+ * A question about a Brazilian state, answered with text.
+ * - Flags: shows the state flag, the answer is the state name
+ * - Abbreviations: shows the state name, the answer is its abbreviation ("MG")
+ */
+export interface StateQuestion {
   readonly id: string
-  readonly mode: typeof GameMode.STATE_FLAGS
+  readonly mode: StateGameMode
   readonly stateCode: string
+  readonly stateName: string
   readonly answer: string
 }
 
-export type Question = MathQuestion | FlagQuestion
+export type Question = MathQuestion | StateQuestion
+
+export function isStateQuestion(question: Question): question is StateQuestion {
+  return isStateMode(question.mode)
+}
 
 export function createPowerQuestion(base: number, exponent: number): MathQuestion {
   return {
@@ -48,11 +57,22 @@ export function createRootQuestion(radicand: number, index: number): MathQuestio
   }
 }
 
-export function createFlagQuestion(state: BrazilianState): FlagQuestion {
+export function createFlagQuestion(state: BrazilianState): StateQuestion {
   return {
     id: `flag:${state.code}`,
     mode: GameMode.STATE_FLAGS,
     stateCode: state.code,
+    stateName: state.name,
     answer: state.name,
+  }
+}
+
+export function createAbbreviationQuestion(state: BrazilianState): StateQuestion {
+  return {
+    id: `abbreviation:${state.code}`,
+    mode: GameMode.STATE_ABBREVIATIONS,
+    stateCode: state.code,
+    stateName: state.name,
+    answer: state.code.toUpperCase(),
   }
 }

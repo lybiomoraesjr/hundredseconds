@@ -1,7 +1,7 @@
 import { GameMode, isMathMode, type MathGameMode } from '../entities/GameMode'
 import type { Question } from '../entities/Question'
 import { resolveDifficultyLevel } from './DifficultyLevelResolver'
-import { FLAG_QUESTIONS, questionsBelow, questionsFor } from './QuestionCatalog'
+import { questionsBelow, questionsFor, stateQuestionsFor } from './QuestionCatalog'
 
 /** Returns a number in [0, 1), like Math.random. Injected to make tests deterministic. */
 export type RandomSource = () => number
@@ -19,15 +19,16 @@ export class QuestionGenerator {
   /**
    * Draws the next question, never repeating the previous one.
    * - Math: based on the current score; higher levels may also bring back questions from the lower levels.
-   * - Flags: no flag repeats until every flag was shown (usedIds holds the ids already shown in the current round).
+   * - State games: no state repeats until every state was shown (usedIds holds the ids already shown in the current round).
    */
   next(mode: GameMode, score: number, previous?: Question, usedIds: readonly string[] = []): Question {
     if (isMathMode(mode)) {
       return this.nextMath(mode, score, previous)
     }
-    const unused = FLAG_QUESTIONS.filter((question) => !usedIds.includes(question.id))
-    // Every flag was shown: a new round starts with all of them again
-    return this.pick(unused.length > 0 ? unused : FLAG_QUESTIONS, previous)
+    const all = stateQuestionsFor(mode)
+    const unused = all.filter((question) => !usedIds.includes(question.id))
+    // Every state was shown: a new round starts with all of them again
+    return this.pick(unused.length > 0 ? unused : all, previous)
   }
 
   private nextMath(mode: MathGameMode, score: number, previous?: Question): Question {

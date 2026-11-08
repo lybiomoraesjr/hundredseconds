@@ -212,4 +212,38 @@ describe('GamePage', () => {
       expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 0')
     })
   })
+
+  describe('abbreviations', () => {
+    const currentState = () =>
+      BRAZILIAN_STATES.find((state) => state.name === screen.getByTestId('state-name').textContent)!
+
+    it('shows a state name and accepts its abbreviation, typed in uppercase letters only', async () => {
+      const { user } = setup(GameMode.STATE_ABBREVIATIONS)
+      await skipCountdown()
+      expect(screen.getByText('Qual é a sigla deste estado?')).toBeInTheDocument()
+      const input = screen.getByLabelText('Sua resposta')
+      expect(input).toHaveAttribute('maxlength', '2')
+
+      await user.type(input, '1m-g')
+      expect(input).toHaveValue('MG')
+      await user.clear(input)
+
+      await user.type(input, `${currentState().code}{Enter}`)
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+    })
+
+    it('reveals the state name and its abbreviation after the first mistake', async () => {
+      const { user } = setup(GameMode.STATE_ABBREVIATIONS)
+      await skipCountdown()
+      const state = currentState()
+      await user.type(screen.getByLabelText('Sua resposta'), 'XX{Enter}')
+
+      const reveal = screen.getByRole('alert')
+      expect(reveal).toHaveTextContent(state.name)
+      expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.code.toUpperCase())
+      await advance(1500)
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 0')
+    })
+  })
 })

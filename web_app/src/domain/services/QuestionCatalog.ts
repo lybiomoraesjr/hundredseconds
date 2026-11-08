@@ -1,12 +1,13 @@
 import { DifficultyLevel } from '../entities/DifficultyLevel'
 import { BRAZILIAN_STATES } from '../entities/BrazilianState'
-import { GameMode, type MathGameMode } from '../entities/GameMode'
+import { GameMode, type MathGameMode, type StateGameMode } from '../entities/GameMode'
 import {
+  createAbbreviationQuestion,
   createFlagQuestion,
   createPowerQuestion,
   createRootQuestion,
-  type FlagQuestion,
   type MathQuestion,
+  type StateQuestion,
 } from '../entities/Question'
 
 const range = (from: number, to: number): number[] =>
@@ -77,5 +78,12 @@ export function questionsBelow(mode: MathGameMode, level: DifficultyLevel): read
   return LEVEL_ORDER.slice(0, LEVEL_ORDER.indexOf(level)).flatMap((lower) => CATALOG[mode][lower])
 }
 
-/** One question per state flag (no difficulty levels). */
-export const FLAG_QUESTIONS: readonly FlagQuestion[] = BRAZILIAN_STATES.map(createFlagQuestion)
+// One question per state (no difficulty levels)
+const STATE_QUESTIONS: Record<StateGameMode, readonly StateQuestion[]> = {
+  [GameMode.STATE_FLAGS]: BRAZILIAN_STATES.map(createFlagQuestion),
+  [GameMode.STATE_ABBREVIATIONS]: BRAZILIAN_STATES.map(createAbbreviationQuestion),
+}
+
+export function stateQuestionsFor(mode: StateGameMode): readonly StateQuestion[] {
+  return STATE_QUESTIONS[mode]
+}

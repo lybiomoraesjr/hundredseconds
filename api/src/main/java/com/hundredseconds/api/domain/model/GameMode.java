@@ -7,5 +7,7 @@ public enum GameMode {
 	EXPONENTIATION,
 	ROOT_EXTRACTION,
 	/** Guess the Brazilian state from its flag. */
-	STATE_FLAGS
+	STATE_FLAGS,
+	/** Type the abbreviation of a Brazilian state. */
+	STATE_ABBREVIATIONS
 }

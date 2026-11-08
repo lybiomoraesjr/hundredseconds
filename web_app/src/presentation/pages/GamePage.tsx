@@ -2,7 +2,7 @@ import { Button, Center, Group, Stack, Text, TextInput } from '@mantine/core'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useGame } from '../../application/game/useGame'
 import type { FinishedMatch } from '../../application/ports/ScoreGateway'
-import { GameMode, type Question } from '../../domain'
+import { GameMode, isStateQuestion, type Question } from '../../domain'
 import { preloadFlags } from '../components/flagImages'
 import { GameBoard } from '../components/GameBoard'
 import { MathExpression } from '../components/MathExpression'
@@ -11,6 +11,40 @@ import { StarBar } from '../components/StarBar'
 import { TimerBar } from '../components/TimerBar'
 import { messages } from '../i18n/messages'
 import classes from './GamePage.module.css'
+
+interface AnswerInputConfig {
+  readonly className?: string
+  readonly inputMode: 'numeric' | 'text'
+  readonly placeholder?: string
+  readonly maxLength?: number
+  readonly autoCapitalize: 'off' | 'characters'
+  /** Cleans what the player types before it reaches the box. */
+  readonly sanitize: (value: string) => string
+}
+
+/** How the answer box behaves in each game. */
+function answerInputFor(mode: GameMode): AnswerInputConfig {
+  switch (mode) {
+    case GameMode.STATE_FLAGS:
+      return {
+        className: classes.textAnswer,
+        inputMode: 'text',
+        placeholder: messages.game.flagAnswerPlaceholder,
+        autoCapitalize: 'off',
+        sanitize: (value) => value,
+      }
+    case GameMode.STATE_ABBREVIATIONS:
+      return {
+        inputMode: 'text',
+        placeholder: messages.game.abbreviationAnswerPlaceholder,
+        maxLength: 2,
+        autoCapitalize: 'characters',
+        sanitize: (value) => value.replace(/[^a-zA-Z]/g, '').toUpperCase(),
+      }
+    default:
+      return { inputMode: 'numeric', autoCapitalize: 'off', sanitize: (value) => value.replace(/\D/g, '') }
+  }
+}
 
 interface GamePageProps {
   mode: GameMode
@@ -28,6 +62,7 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
   const isRetry = state.lastOutcome === 'WRONG_RETRY'
   const best = Math.max(personalBest ?? 0, session.score)
   const isFlagGame = mode === GameMode.STATE_FLAGS
+  const input = answerInputFor(mode)
 
   // Flags are downloaded during the countdown, so none of them pops in late
   useEffect(() => {
@@ -75,20 +110,20 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
               <TextInput
                 key={state.mistakeCount}
                 ref={inputRef}
-                className={`${classes.answerInput} ${isFlagGame ? classes.textAnswer : ''} ${isRetry ? classes.shake : ''}`}
+                className={`${classes.answerInput} ${input.className ?? ''} ${isRetry ? classes.shake : ''}`}
                 aria-label={messages.game.answerLabel}
                 value={answer}
                 onChange={(event) => {
-                  const value = event.currentTarget.value
-                  setAnswer(isFlagGame ? value : value.replace(/\D/g, ''))
+                  setAnswer(input.sanitize(event.currentTarget.value))
                   clearFeedback()
                 }}
                 error={isRetry}
-                inputMode={isFlagGame ? 'text' : 'numeric'}
-                placeholder={isFlagGame ? messages.game.flagAnswerPlaceholder : undefined}
+                inputMode={input.inputMode}
+                placeholder={input.placeholder}
+                maxLength={input.maxLength}
                 autoComplete="off"
                 autoCorrect="off"
-                autoCapitalize="off"
+                autoCapitalize={input.autoCapitalize}
                 spellCheck={false}
                 autoFocus
                 disabled={status !== 'PLAYING'}
@@ -114,11 +149,19 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
 }
 
 function QuestionPrompt({ question }: { question: Question }) {
-  if (question.mode === GameMode.STATE_FLAGS) {
+  if (isStateQuestion(question)) {
+    if (question.mode === GameMode.STATE_FLAGS) {
+      return (
+        <Stack align="center" gap="sm" data-testid="question">
+          <Text c="white" fw={600} size="lg">{messages.game.flagQuestion}</Text>
+          <StateFlag stateCode={question.stateCode} />
+        </Stack>
+      )
+    }
     return (
       <Stack align="center" gap="sm" data-testid="question">
-        <Text c="white" fw={600} size="lg">{messages.game.flagQuestion}</Text>
-        <StateFlag stateCode={question.stateCode} />
+        <Text c="white" fw={600} size="lg">{messages.game.abbreviationQuestion}</Text>
+        <Text className={classes.stateName} c="white" data-testid="state-name">{question.stateName}</Text>
       </Stack>
     )
   }
@@ -130,11 +173,19 @@ function QuestionPrompt({ question }: { question: Question }) {
 }
 
 function RevealedAnswer({ question }: { question: Question }) {
-  if (question.mode === GameMode.STATE_FLAGS) {
+  if (isStateQuestion(question)) {
+    if (question.mode === GameMode.STATE_FLAGS) {
+      return (
+        <Stack align="center" gap="md">
+          <StateFlag stateCode={question.stateCode} size="lg" />
+          <Text className={classes.revealName} data-testid="revealed-answer">{question.answer}</Text>
+        </Stack>
+      )
+    }
     return (
-      <Stack align="center" gap="md">
-        <StateFlag stateCode={question.stateCode} size="lg" />
-        <Text className={classes.revealName} data-testid="revealed-answer">{question.answer}</Text>
+      <Stack align="center" gap={0}>
+        <Text className={classes.revealName}>{question.stateName}</Text>
+        <Text className={classes.revealExpression} data-testid="revealed-answer">{question.answer}</Text>
       </Stack>
     )
   }
