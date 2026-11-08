@@ -30,10 +30,10 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
 3. **Bandeiras dos estados** (`STATE_FLAGS`): aparece a bandeira de um estado brasileiro (26 estados + DF) e o jogador digita o nome do estado. Regras próprias:
    * As bandeiras saem em ordem aleatória e **nenhuma se repete até as 27 aparecerem**; depois começa uma nova rodada (sem repetir a última bandeira em seguida).
    * A resposta é comparada **ignorando maiúsculas/minúsculas, acentos e espaços extras** ("sao paulo" = "São Paulo"). Apenas o nome completo é aceito (a sigla não vale).
-   * **Uma única tentativa:** ao errar, a bandeira e o nome correto cobrem a tela por **1,5 segundo** (o cronômetro continua correndo) e a próxima bandeira aparece.
+   * **Duas tentativas**, como na matemática: no primeiro erro a caixa fica vermelha e o jogador tenta de novo; no segundo, a bandeira e o nome correto cobrem a tela por **1,5 segundo** (o cronômetro continua correndo) e a próxima bandeira aparece.
    * Duração (100 s), estrelas, contador de erros e rankings funcionam como nas outras modalidades. Não há níveis de dificuldade.
    * Imagens em `web_app/public/flags/<sigla>.webp`.
-4. **Siglas dos estados** (`STATE_ABBREVIATIONS`): aparece o nome de um estado (26 estados + DF) e o jogador digita a sigla (ex.: Minas Gerais → `MG`). Segue as mesmas regras das Bandeiras (27 por rodada sem repetição, uma única tentativa, revelação de 1,5 s com o nome e a sigla). O campo aceita apenas letras, no máximo 2, convertidas para maiúsculas.
+4. **Siglas dos estados** (`STATE_ABBREVIATIONS`): aparece o nome de um estado (26 estados + DF) e o jogador digita a sigla (ex.: Minas Gerais → `MG`). Segue as mesmas regras das Bandeiras (27 por rodada sem repetição, duas tentativas, revelação de 1,5 s com o nome e a sigla). O campo aceita apenas letras, no máximo 2, convertidas para maiúsculas.
 5. **Capitais dos estados** (`STATE_CAPITALS`): aparece o nome de um estado e o jogador digita a capital (ex.: Minas Gerais → Belo Horizonte; para o Distrito Federal, **Brasília**). Mesmas regras das Bandeiras, com a mesma comparação que ignora acentos, maiúsculas e espaços extras.
 6. **Gentílicos das capitais** (`CAPITAL_DEMONYMS`, rótulo "Gentílicos (capitais)"): aparece o nome de uma capital e o jogador digita o gentílico de quem nasce nela (ex.: Salvador → soteropolitano). Mesmas regras das Bandeiras, com tolerâncias extras na comparação:
    * Hífens e espaços são ignorados ("belo horizontino" e "belohorizontino" = "belo-horizontino").
@@ -55,7 +55,7 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
   * O jogador digita os números no teclado e pressiona a tecla `Enter` (ou clica no botão "Respondida") para submeter.
   * **Acerto:** Soma $+1$ ao resultado atual, limpa o campo de texto imediatamente e gera a próxima questão.
   * **Erro (1ª tentativa):** A caixa de texto recebe uma **borda vermelha**, o campo é limpo e o jogador pode tentar **mais uma vez** a mesma questão.
-  * **Erro (2ª tentativa):** A caixa de texto desaparece e a **resposta correta é exibida cobrindo toda a tela por $1$ segundo**; em seguida uma nova questão é gerada (sem pontuar). O cronômetro **continua correndo** durante esse segundo, ou seja, o jogador **perde esse segundo** de propósito.
+  * **Erro (2ª tentativa):** A caixa de texto desaparece e a **resposta correta é exibida cobrindo toda a tela por $1$ segundo** ($1{,}5$ s nos jogos de geografia); em seguida uma nova questão é gerada (sem pontuar). O cronômetro **continua correndo** durante esse segundo, ou seja, o jogador **perde esse segundo** de propósito.
   * **Contador de erros:** Cada resposta errada submetida soma $+1$ ao contador `wrongAnswers` da partida (uma questão pode gerar até $2$ erros). Submissões vazias são ignoradas e não contam como erro.
   * **Fim da partida:** Após os $100$ segundos é exibida uma tela de resultado com a quantidade de acertos, estrelas e **quantidade de respostas erradas**.
 

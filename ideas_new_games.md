@@ -2,7 +2,7 @@
 
 > Rascunho de ideias, ainda não é especificação. Data: 2026-11-07.
 >
-> **Todos os jogos desta lista foram implementados** (2026-11-08). "Estados brasileiros" virou o jogo do mapa (estado destacado → nome). Também foi criado o jogo de **Gentílicos dos estados**, que não estava na lista. As regras estão na seção 2.1 de `requirements_specification_100_seconds_game.md`: 100 s, pontuação por acertos e uma única tentativa.
+> **Todos os jogos desta lista foram implementados** (2026-11-08). "Estados brasileiros" virou o jogo do mapa (estado destacado → nome). Também foi criado o jogo de **Gentílicos dos estados**, que não estava na lista. As regras estão na seção 2.1 de `requirements_specification_100_seconds_game.md`: 100 s, pontuação por acertos e duas tentativas (como na matemática; antes era uma só).
 
 ## Jogos
 
@@ -20,7 +20,7 @@ Base: 26 estados + Distrito Federal = **27 itens** por jogo.
 
 - Os itens aparecem em **ordem aleatória**.
 - A pessoa digita a resposta e aperta **Enter** para enviar.
-- Se errar, **aparece a resposta certa** e o tempo **continua correndo**.
+- Duas tentativas: no primeiro erro dá para tentar de novo; no segundo, **aparece a resposta certa** e o tempo **continua correndo**.
 - Se a pessoa estiver **logada**, o tempo dela fica registrado (histórico e ranking, como já existe hoje).
 
 ## Em aberto

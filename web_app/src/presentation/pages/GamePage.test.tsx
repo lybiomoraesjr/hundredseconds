@@ -195,10 +195,17 @@ describe('GamePage', () => {
       expect(input).toHaveValue('')
     })
 
-    it('reveals the state name after the first mistake and moves to another flag', async () => {
+    it('reveals the state name after the second mistake and moves to another flag', async () => {
       const { user } = setup(GameMode.STATE_FLAGS)
       await skipCountdown()
       const state = currentState()
+
+      await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
+
+      // First mistake: same flag, one more try
+      expect(screen.getByText('Errou! Tente mais uma vez.')).toBeInTheDocument()
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(currentState().code).toBe(state.code)
 
       await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
 
@@ -232,10 +239,11 @@ describe('GamePage', () => {
       expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
     })
 
-    it('reveals the state name and its abbreviation after the first mistake', async () => {
+    it('reveals the state name and its abbreviation after the second mistake', async () => {
       const { user } = setup(GameMode.STATE_ABBREVIATIONS)
       await skipCountdown()
       const state = currentState()
+      await user.type(screen.getByLabelText('Sua resposta'), 'XX{Enter}')
       await user.type(screen.getByLabelText('Sua resposta'), 'XX{Enter}')
 
       const reveal = screen.getByRole('alert')
@@ -264,11 +272,12 @@ describe('GamePage', () => {
       expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
     })
 
-    it('reveals the state and its capital after the first mistake', async () => {
+    it('reveals the state and its capital after the second mistake', async () => {
       const { user } = setup(GameMode.STATE_CAPITALS)
       await skipCountdown()
       const state = currentState()
 
+      await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
       await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
 
       expect(screen.getByRole('alert')).toHaveTextContent(state.name)
@@ -293,11 +302,12 @@ describe('GamePage', () => {
       expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
     })
 
-    it('reveals the capital and its main demonym after the first mistake', async () => {
+    it('reveals the capital and its main demonym after the second mistake', async () => {
       const { user } = setup(GameMode.CAPITAL_DEMONYMS)
       await skipCountdown()
       const state = currentState()
 
+      await user.type(screen.getByLabelText('Sua resposta'), 'atlante{Enter}')
       await user.type(screen.getByLabelText('Sua resposta'), 'atlante{Enter}')
 
       expect(screen.getByRole('alert')).toHaveTextContent(state.capital)
@@ -326,11 +336,12 @@ describe('GamePage', () => {
       expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
     })
 
-    it('reveals the state name on the map after the first mistake', async () => {
+    it('reveals the state name on the map after the second mistake', async () => {
       const { user } = setup(GameMode.STATE_MAP)
       await skipCountdown()
       const state = await currentState()
 
+      await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
       await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
 
       expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.name)
@@ -353,11 +364,12 @@ describe('GamePage', () => {
       expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
     })
 
-    it('reveals the state and its main demonym after the first mistake', async () => {
+    it('reveals the state and its main demonym after the second mistake', async () => {
       const { user } = setup(GameMode.STATE_DEMONYMS)
       await skipCountdown()
       const state = currentState()
 
+      await user.type(screen.getByLabelText('Sua resposta'), 'atlante{Enter}')
       await user.type(screen.getByLabelText('Sua resposta'), 'atlante{Enter}')
 
       expect(screen.getByRole('alert')).toHaveTextContent(state.name)

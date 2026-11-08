@@ -75,12 +75,16 @@ export async function answerGeographyCorrectly(page: Page, game: GeographyGame, 
   }
 }
 
-/** Misses once: the correct answer covers the screen for 1.5 s, then a new question shows up. */
+/** Misses twice: after the second mistake the correct answer covers the screen for 1.5 s, then a new question shows up. */
 export async function missGeographyQuestion(page: Page, game: GeographyGame) {
   const expected = game.answerOf(await game.currentState(page))
+  const input = page.getByLabel('Sua resposta')
   // Digits are filtered out of abbreviations, so use letters that are never a state code
-  await page.getByLabel('Sua resposta').fill('XX')
-  await page.getByLabel('Sua resposta').press('Enter')
+  await input.fill('XX')
+  await input.press('Enter')
+  await expect(page.getByText('Errou! Tente mais uma vez.')).toBeVisible()
+  await input.fill('XX')
+  await input.press('Enter')
   await expect(page.getByTestId('revealed-answer')).toHaveText(expected)
   await page.clock.runFor(1600)
   await expect(page.getByRole('alert')).toBeHidden()

@@ -92,12 +92,17 @@ describe('GameSession', () => {
 })
 
 describe('GameSession with flags', () => {
-  it('reveals the answer right after the first mistake', () => {
+  it('allows one more try after the first mistake and reveals the answer after the second', () => {
     const session = startSession(GameMode.STATE_FLAGS, generator)
-    const { session: next, outcome } = submitAnswer(session, 'Atlântida', generator)
-    expect(outcome).toBe('WRONG_REVEAL')
-    expect(next.phase).toBe('REVEALING_ANSWER')
-    expect(next.wrongAnswers).toBe(1)
+    const first = submitAnswer(session, 'Atlântida', generator)
+    expect(first.outcome).toBe('WRONG_RETRY')
+    expect(first.session.phase).toBe('ANSWERING')
+    expect(first.session.currentQuestion).toBe(session.currentQuestion)
+
+    const second = submitAnswer(first.session, 'Atlântida', generator)
+    expect(second.outcome).toBe('WRONG_REVEAL')
+    expect(second.session.phase).toBe('REVEALING_ANSWER')
+    expect(second.session.wrongAnswers).toBe(2)
   })
 
   it('accepts the state name without accents', () => {
@@ -127,6 +132,7 @@ describe('GameSession with flags', () => {
   it('keeps the round going after a revealed answer', () => {
     let session = startSession(GameMode.STATE_FLAGS, generator)
     const first = session.currentQuestion.id
+    session = submitAnswer(session, 'errado', generator).session
     session = submitAnswer(session, 'errado', generator).session
     session = finishReveal(session, generator)
     expect(session.currentQuestion.id).not.toBe(first)

@@ -1,5 +1,5 @@
 import type { GameMode } from './GameMode'
-import { maxAttemptsFor } from './GameRules'
+import { GameRules } from './GameRules'
 import type { Question } from './Question'
 import { checkAnswer } from '../services/AnswerChecker'
 import type { QuestionGenerator } from '../services/QuestionGenerator'
@@ -72,7 +72,7 @@ export function submitAnswer(session: GameSession, input: string,
   }
 
   const wrongAnswers = session.wrongAnswers + 1
-  if (session.attempt < maxAttemptsFor(session.mode)) {
+  if (session.attempt < GameRules.MAX_ATTEMPTS) {
     return {
       outcome: 'WRONG_RETRY',
       session: { ...session, wrongAnswers, attempt: session.attempt + 1 },

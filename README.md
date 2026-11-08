@@ -27,8 +27,9 @@ Jogo web de perguntas rápidas: quantas perguntas você consegue responder em 10
 
 - Uma contagem regressiva (3, 2, 1) com sinal sonoro, depois **100 segundos** para responder o máximo possível. A resposta é enviada com `Enter`.
 - Cada acerto vale 1 ponto, e **a cada 10 acertos você ganha uma estrela** (com um "plim"), até 10 estrelas. Um beep avisa quando faltam 10 segundos.
-- **Matemática:** a dificuldade sobe conforme você acerta. No primeiro erro a caixa fica vermelha e você tenta de novo; no segundo, a resposta certa aparece por 1 segundo e o tempo continua correndo.
-- **Geografia:** os 27 estados (26 + DF) aparecem sem repetir até todos saírem. Uma tentativa só: se errar, a resposta certa aparece por 1,5 segundo. Acentos, maiúsculas e espaços extras são ignorados ("sao paulo" vale "São Paulo"), e nos gentílicos também valem o feminino, a forma sem hífen e as formas alternativas oficiais.
+- **Duas tentativas por pergunta (todos os jogos):** no primeiro erro a caixa fica vermelha e você tenta de novo; no segundo, a resposta certa aparece (por 1 segundo na matemática e 1,5 segundo na geografia) e o tempo continua correndo.
+- **Matemática:** a dificuldade sobe conforme você acerta.
+- **Geografia:** os 27 estados (26 + DF) aparecem sem repetir até todos saírem. Acentos, maiúsculas e espaços extras são ignorados ("sao paulo" vale "São Paulo"), e nos gentílicos também valem o feminino, a forma sem hífen e as formas alternativas oficiais.
 - Sem conta, o recorde fica salvo no navegador e você pode publicar o resultado no ranking com um nome. Com conta, os resultados vão para o servidor. Há rankings separados por jogo, do dia, da semana e do ano.
 
 ## Telas
