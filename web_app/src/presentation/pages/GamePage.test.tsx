@@ -146,6 +146,36 @@ describe('GamePage', () => {
     expect(onFinished).toHaveBeenCalledWith({ mode: GameMode.EXPONENTIATION, score: 1, wrongAnswers: 1 })
   })
 
+  it('chimes each time a star is earned', async () => {
+    const { user, services } = setup(GameMode.EXPONENTIATION)
+    await skipCountdown()
+    for (let i = 0; i < 9; i++) {
+      await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer()}{Enter}`)
+    }
+    expect(services.beeper.star).not.toHaveBeenCalled()
+
+    await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer()}{Enter}`)
+    expect(services.beeper.star).toHaveBeenCalledTimes(1)
+
+    for (let i = 0; i < 9; i++) {
+      await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer()}{Enter}`)
+    }
+    expect(services.beeper.star).toHaveBeenCalledTimes(1)
+    await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer()}{Enter}`)
+    expect(services.beeper.star).toHaveBeenCalledTimes(2)
+  })
+
+  it('chimes for stars in the flags game too', async () => {
+    const { user, services } = setup(GameMode.STATE_FLAGS)
+    await skipCountdown()
+    const flagName = () => BRAZILIAN_STATES.find((state) =>
+      state.code === screen.getByRole('img', { name: 'Bandeira de um estado brasileiro' }).getAttribute('data-state'))!.name
+    for (let i = 0; i < 10; i++) {
+      await user.type(screen.getByLabelText('Sua resposta'), `${flagName()}{Enter}`)
+    }
+    expect(services.beeper.star).toHaveBeenCalledTimes(1)
+  })
+
   describe('flags', () => {
     const flag = () => screen.getByRole('img', { name: 'Bandeira de um estado brasileiro' })
     const currentState = () => BRAZILIAN_STATES.find((state) => state.code === flag().getAttribute('data-state'))!

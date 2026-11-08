@@ -52,7 +52,7 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
 
 ### 2.3. Sistema de Estrelas
 * Na parte inferior da tela do jogo, existem $10$ espaços para estrelas (inicialmente brancas/vazias).
-* A cada **$10$ respostas corretas**, o jogador ganha **$1$ estrela** (que fica preenchida/amarela).
+* A cada **$10$ respostas corretas**, o jogador ganha **$1$ estrela** (que fica preenchida/amarela) e toca um **som curto de recompensa** (duas notas ascendentes), em todas as modalidades.
 * O limite máximo é de **$10$ estrelas** (atingido ao alcançar $100$ respostas corretas).
 * O jogador pode continuar respondendo e pontuando normalmente acima de $100$ acertos, mas não ganhará estrelas adicionais.
 

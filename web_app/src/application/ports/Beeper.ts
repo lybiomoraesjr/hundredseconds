@@ -8,4 +8,6 @@ export interface Beeper {
   start(): void
   /** Single warning when 10 seconds are left. */
   warning(): void
+  /** Rewarding chime each time a star is earned. */
+  star(): void
 }

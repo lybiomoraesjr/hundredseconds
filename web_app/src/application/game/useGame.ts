@@ -67,6 +67,16 @@ export function useGame(mode: GameMode, onFinished: (match: FinishedMatch) => vo
     previousSecondsLeft.current = secondsLeft
   }, [secondsLeft, beeper])
 
+  // Chime each time a new star is earned (no more after the 10th star)
+  const stars = starsFor(state.session.score)
+  const previousStars = useRef(stars)
+  useEffect(() => {
+    if (stars > previousStars.current) {
+      beeper.star()
+    }
+    previousStars.current = stars
+  }, [stars, beeper])
+
   // Notify the end of the match exactly once
   const onFinishedRef = useRef(onFinished)
   useEffect(() => {
@@ -82,5 +92,5 @@ export function useGame(mode: GameMode, onFinished: (match: FinishedMatch) => vo
   const submit = useCallback((input: string) => dispatch({ type: 'SUBMIT', input }), [])
   const clearFeedback = useCallback(() => dispatch({ type: 'CLEAR_FEEDBACK' }), [])
 
-  return { state, stars: starsFor(state.session.score), submit, clearFeedback }
+  return { state, stars, submit, clearFeedback }
 }
