@@ -44,6 +44,7 @@ function answerInputFor(mode: GameMode): AnswerInputConfig {
         sanitize: (value) => value,
       }
     case GameMode.CAPITAL_DEMONYMS:
+    case GameMode.STATE_DEMONYMS:
       return {
         className: classes.textAnswer,
         inputMode: 'text',
@@ -174,6 +175,7 @@ const TEXT_PROMPT_QUESTIONS: Record<StateGameMode, string> = {
   [GameMode.STATE_CAPITALS]: messages.game.capitalQuestion,
   [GameMode.CAPITAL_DEMONYMS]: messages.game.demonymQuestion,
   [GameMode.STATE_MAP]: messages.game.mapQuestion,
+  [GameMode.STATE_DEMONYMS]: messages.game.stateDemonymQuestion,
 }
 
 /** Keeps the space of the map while its code is still downloading, so the layout does not jump. */

@@ -10,10 +10,15 @@ export const messages = {
     [GameMode.STATE_FLAGS]: 'Bandeiras',
     [GameMode.STATE_ABBREVIATIONS]: 'Siglas',
     [GameMode.STATE_CAPITALS]: 'Capitais',
-    [GameMode.CAPITAL_DEMONYMS]: 'Gentílicos',
+    [GameMode.CAPITAL_DEMONYMS]: 'Gentílicos (capitais)',
     [GameMode.STATE_MAP]: 'Estados',
+    [GameMode.STATE_DEMONYMS]: 'Gentílicos (estados)',
   },
   modeSelectorLabel: 'Modalidade',
+  modeGroups: {
+    math: 'Matemática',
+    geography: 'Geografia do Brasil',
+  },
   summary: {
     personalBest: 'O seu resultado mais alto:',
     todayBest: 'Resultado mais alto de hoje:',
@@ -40,6 +45,7 @@ export const messages = {
     capitalAnswerPlaceholder: 'Nome da capital',
     demonymQuestion: 'Qual é o gentílico de quem nasce nesta capital?',
     demonymAnswerPlaceholder: 'Gentílico',
+    stateDemonymQuestion: 'Qual é o gentílico de quem nasce neste estado?',
     mapQuestion: 'Qual é o estado destacado no mapa?',
     // Must not reveal the answer
     mapAlt: 'Mapa do Brasil com um estado destacado',

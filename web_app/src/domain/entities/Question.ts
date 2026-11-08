@@ -21,6 +21,7 @@ export interface MathQuestion {
  * - Capitals: shows the state name, the answer is its capital
  * - Capital demonyms: shows the capital, the answer is its demonym ("soteropolitano")
  * - Map: highlights the state on the map of Brazil, the answer is the state name
+ * - State demonyms: shows the state name, the answer is its demonym ("baiano")
  */
 export interface StateQuestion {
   readonly id: string
@@ -90,8 +91,14 @@ function withFeminineForms(demonyms: readonly string[]): string[] {
   return demonyms.flatMap((demonym) => (demonym.endsWith('o') ? [demonym, `${demonym.slice(0, -1)}a`] : [demonym]))
 }
 
-export function createDemonymQuestion(state: BrazilianState): StateQuestion {
+export function createCapitalDemonymQuestion(state: BrazilianState): StateQuestion {
   const [main] = state.capitalDemonyms
   return stateQuestion(GameMode.CAPITAL_DEMONYMS, 'demonym', state, state.capital, main,
     withFeminineForms(state.capitalDemonyms))
+}
+
+export function createStateDemonymQuestion(state: BrazilianState): StateQuestion {
+  const [main] = state.stateDemonyms
+  return stateQuestion(GameMode.STATE_DEMONYMS, 'state-demonym', state, state.name, main,
+    withFeminineForms(state.stateDemonyms))
 }

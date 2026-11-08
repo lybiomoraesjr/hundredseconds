@@ -338,4 +338,30 @@ describe('GamePage', () => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
   })
+
+  describe('state demonyms', () => {
+    const currentState = () =>
+      BRAZILIAN_STATES.find((state) => state.name === screen.getByTestId('prompt').textContent)!
+
+    it('shows a state name and accepts its demonym', async () => {
+      const { user } = setup(GameMode.STATE_DEMONYMS)
+      await skipCountdown()
+      expect(screen.getByText('Qual é o gentílico de quem nasce neste estado?')).toBeInTheDocument()
+
+      await user.type(screen.getByLabelText('Sua resposta'), `${currentState().stateDemonyms[0]}{Enter}`)
+
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+    })
+
+    it('reveals the state and its main demonym after the first mistake', async () => {
+      const { user } = setup(GameMode.STATE_DEMONYMS)
+      await skipCountdown()
+      const state = currentState()
+
+      await user.type(screen.getByLabelText('Sua resposta'), 'atlante{Enter}')
+
+      expect(screen.getByRole('alert')).toHaveTextContent(state.name)
+      expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.stateDemonyms[0])
+    })
+  })
 })

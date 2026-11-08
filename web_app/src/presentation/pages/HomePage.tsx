@@ -5,6 +5,7 @@ import { GameBoard } from '../components/GameBoard'
 import { ScoreSummaryPanel } from '../components/ScoreSummaryPanel'
 import { UserMenu } from '../components/UserMenu'
 import { messages } from '../i18n/messages'
+import { GAME_MODE_GROUPS } from './gameModeGroups'
 
 interface HomePageProps {
   mode: GameMode
@@ -32,13 +33,20 @@ export function HomePage({ mode, summary, onModeChange, onStart, onOpenHighscore
       <Stack align="center" justify="center" gap="xl" flex={1} py="xl">
         {/* Chips wrap to new lines, so new games keep fitting on small screens */}
         <Chip.Group multiple={false} value={mode} onChange={(value) => onModeChange(value as GameMode)}>
-          <Group justify="center" gap="xs" role="radiogroup" aria-label={messages.modeSelectorLabel} maw={520}>
-            {Object.values(GameMode).map((value) => (
-              <Chip key={value} value={value} size="md" variant="filled" color="green.6">
-                {messages.modes[value]}
-              </Chip>
+          <Stack gap="md" align="center" role="radiogroup" aria-label={messages.modeSelectorLabel} maw={560}>
+            {GAME_MODE_GROUPS.map((group) => (
+              <Stack key={group.label} gap={6} align="center">
+                <Text c="white" fw={700} size="sm" tt="uppercase" opacity={0.9}>{group.label}</Text>
+                <Group justify="center" gap="xs">
+                  {group.modes.map((value) => (
+                    <Chip key={value} value={value} size="md" variant="filled" color="green.6">
+                      {messages.modes[value]}
+                    </Chip>
+                  ))}
+                </Group>
+              </Stack>
             ))}
-          </Group>
+          </Stack>
         </Chip.Group>
         <Button size="xl" radius="xl" color="green.6" px={56} onClick={onStart}>
           {messages.start}

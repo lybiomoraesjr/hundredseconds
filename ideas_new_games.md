@@ -2,7 +2,7 @@
 
 > Rascunho de ideias, ainda não é especificação. Data: 2026-11-07.
 >
-> **Todos os jogos desta lista foram implementados** (2026-11-08). "Estados brasileiros" virou o jogo do mapa (estado destacado → nome). As regras estão na seção 2.1 de `requirements_specification_100_seconds_game.md`: 100 s, pontuação por acertos e uma única tentativa.
+> **Todos os jogos desta lista foram implementados** (2026-11-08). "Estados brasileiros" virou o jogo do mapa (estado destacado → nome). Também foi criado o jogo de **Gentílicos dos estados**, que não estava na lista. As regras estão na seção 2.1 de `requirements_specification_100_seconds_game.md`: 100 s, pontuação por acertos e uma única tentativa.
 
 ## Jogos
 
