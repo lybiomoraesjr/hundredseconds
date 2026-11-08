@@ -106,4 +106,5 @@ Código, nomes de arquivos e comentários em inglês; apenas a documentação (`
 ## Créditos
 
 - **Ideia do jogo:** modo [100 segundos](https://www.tabuadademultiplicar.com.br/100-segundos/) do site Tabuada de Multiplicar.
+- **Bandeiras dos estados:** imagens obtidas no blog [Missões Nacionais](https://missoesnacionais.org.br/blog/bandeiras-do-brasil-e-dos-estados/). A do Piauí veio do portal da [Receita Federal](https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/acoes-e-programas/cidadania-fiscal/naf/nucleos/arquivos-e-imagens/piaui.png/image_view_fullscreen). Todas foram convertidas para WebP.
 - **Mapa do Brasil:** [`@svg-maps/brazil`](https://github.com/VictorCazanave/svg-maps/tree/master/packages/brazil), de Victor Cazanave, baseado no mapa do [MapSVG](https://mapsvg.com/maps/brazil), sob a licença [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
