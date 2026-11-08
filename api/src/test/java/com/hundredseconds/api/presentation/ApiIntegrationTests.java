@@ -230,6 +230,16 @@ class ApiIntegrationTests {
 	}
 
 	@Test
+	void healthEndpointShouldBePublic() throws Exception {
+		mockMvc.perform(get("/actuator/health")).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("UP"));
+	}
+
+	@Test
+	void otherActuatorEndpointsShouldNotBeExposed() throws Exception {
+		mockMvc.perform(get("/actuator/env")).andExpect(status().isUnauthorized());
+	}
+
+	@Test
 	void corsShouldAllowTheWebAppOrigin() throws Exception {
 		mockMvc
 			.perform(options("/api/scores").header(HttpHeaders.ORIGIN, "http://localhost:5173")

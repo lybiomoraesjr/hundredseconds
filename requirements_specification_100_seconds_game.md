@@ -237,10 +237,20 @@ presentation/      # Componentes e páginas React
 
 ## 9. Containerização (Docker)
 
-Todos os serviços serão executados via **Docker Compose**:
+Todos os serviços são executados via **Docker Compose** (`docker compose up --build`):
 
-| Serviço | Imagem / Build | Porta sugerida | Descrição |
+| Serviço | Imagem / Build | Porta no host | Descrição |
 | :--- | :--- | :--- | :--- |
+| `db` | `postgres:16-alpine` | `5433` (`POSTGRES_HOST_PORT`) | Banco de dados PostgreSQL com volume persistente `db_data` |
+| `api` | `api/Dockerfile` (multi-stage: Maven → `eclipse-temurin:25-jre-alpine`, usuário não-root) | não exposta | Backend Spring Boot; health check em `/actuator/health/readiness` |
+| `web_app` | `web_app/Dockerfile` (multi-stage: Node build → `nginx:1.29-alpine`) | `8088` (`WEB_HOST_PORT`) | Frontend servido pelo Nginx, que encaminha `/api` para o serviço `api` (mesma origem, sem CORS) |
+
+* Arquivo `docker-compose.yml` na raiz do projeto.
+* Credenciais e configurações (`POSTGRES_*`, `JWT_SECRET`, `APP_TIME_ZONE`, portas) via `.env` (não versionado), com `.env.example` versionado. O compose recusa subir sem `JWT_SECRET`.
+* Ordem de inicialização com health checks: `db` → `api` → `web_app`.
+* Os testes não rodam dentro do build das imagens (os testes de integração usam Testcontainers e precisam do Docker do host).
+
+--- | :--- | :--- | :--- |
 | `db` | `postgres:16` | `5432` | Banco de dados PostgreSQL com volume persistente |
 | `api` | Build de `api/Dockerfile` (multi-stage: Maven + JRE) | `8080` | Backend Spring Boot |
 | `web_app` | Build de `web_app/Dockerfile` (multi-stage: Node build + Nginx) | `80` / `5173` | Frontend React servido pelo Nginx |
@@ -278,7 +288,7 @@ Todos os serviços serão executados via **Docker Compose**:
 | **6** | Integração | Clientes HTTP, login/cadastro, `localStorage` para convidados, salvamento de pontuação |
 | **7** | Containerização final e E2E | Dockerfiles de `api` e `web_app`, compose completo, testes Playwright |
 
-Cada parte termina com testes passando e um commit.
+Cada parte termina com testes passando e um commit. **Status:** todas as 7 partes foram concluídas.
 
 ---
 

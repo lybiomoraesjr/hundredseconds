@@ -47,7 +47,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/scores").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/scores/summary", "/api/scores/leaderboard").permitAll()
-				.requestMatchers("/error").permitAll()
+				.requestMatchers("/error", "/actuator/health/**").permitAll()
 				.anyRequest().authenticated())
 			.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 		return http.build();
