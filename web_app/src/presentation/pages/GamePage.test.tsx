@@ -215,7 +215,7 @@ describe('GamePage', () => {
 
   describe('abbreviations', () => {
     const currentState = () =>
-      BRAZILIAN_STATES.find((state) => state.name === screen.getByTestId('state-name').textContent)!
+      BRAZILIAN_STATES.find((state) => state.name === screen.getByTestId('prompt').textContent)!
 
     it('shows a state name and accepts its abbreviation, typed in uppercase letters only', async () => {
       const { user } = setup(GameMode.STATE_ABBREVIATIONS)
@@ -249,7 +249,7 @@ describe('GamePage', () => {
 
   describe('capitals', () => {
     const currentState = () =>
-      BRAZILIAN_STATES.find((state) => state.name === screen.getByTestId('state-name').textContent)!
+      BRAZILIAN_STATES.find((state) => state.name === screen.getByTestId('prompt').textContent)!
 
     it('shows a state name and accepts its capital without accents', async () => {
       const { user } = setup(GameMode.STATE_CAPITALS)
@@ -273,6 +273,35 @@ describe('GamePage', () => {
 
       expect(screen.getByRole('alert')).toHaveTextContent(state.name)
       expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.capital)
+      await advance(1500)
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('capital demonyms', () => {
+    const currentState = () =>
+      BRAZILIAN_STATES.find((state) => state.capital === screen.getByTestId('prompt').textContent)!
+
+    it('shows a capital and accepts its demonym', async () => {
+      const { user } = setup(GameMode.CAPITAL_DEMONYMS)
+      await skipCountdown()
+      expect(screen.getByText('Qual é o gentílico de quem nasce nesta capital?')).toBeInTheDocument()
+      expect(screen.getByLabelText('Sua resposta')).toHaveAttribute('placeholder', 'Gentílico')
+
+      await user.type(screen.getByLabelText('Sua resposta'), `${currentState().capitalDemonyms[0]}{Enter}`)
+
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+    })
+
+    it('reveals the capital and its main demonym after the first mistake', async () => {
+      const { user } = setup(GameMode.CAPITAL_DEMONYMS)
+      await skipCountdown()
+      const state = currentState()
+
+      await user.type(screen.getByLabelText('Sua resposta'), 'atlante{Enter}')
+
+      expect(screen.getByRole('alert')).toHaveTextContent(state.capital)
+      expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.capitalDemonyms[0])
       await advance(1500)
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })

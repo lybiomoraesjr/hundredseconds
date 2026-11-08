@@ -4,6 +4,7 @@ import { GameMode, type MathGameMode, type StateGameMode } from '../entities/Gam
 import {
   createAbbreviationQuestion,
   createCapitalQuestion,
+  createDemonymQuestion,
   createFlagQuestion,
   createPowerQuestion,
   createRootQuestion,
@@ -84,6 +85,7 @@ const STATE_QUESTIONS: Record<StateGameMode, readonly StateQuestion[]> = {
   [GameMode.STATE_FLAGS]: BRAZILIAN_STATES.map(createFlagQuestion),
   [GameMode.STATE_ABBREVIATIONS]: BRAZILIAN_STATES.map(createAbbreviationQuestion),
   [GameMode.STATE_CAPITALS]: BRAZILIAN_STATES.map(createCapitalQuestion),
+  [GameMode.CAPITAL_DEMONYMS]: BRAZILIAN_STATES.map(createDemonymQuestion),
 }
 
 export function stateQuestionsFor(mode: StateGameMode): readonly StateQuestion[] {

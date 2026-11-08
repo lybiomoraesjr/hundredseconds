@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
+import { BRAZILIAN_STATES } from '../entities/BrazilianState'
 import {
   createAbbreviationQuestion,
   createCapitalQuestion,
+  createDemonymQuestion,
   createFlagQuestion,
   createPowerQuestion,
 } from '../entities/Question'
 import { checkAnswer, normalizeText } from './AnswerChecker'
 
-const saoPaulo = createFlagQuestion({ code: 'sp', name: 'São Paulo', capital: 'São Paulo' })
+const stateOf = (code: string) => BRAZILIAN_STATES.find((state) => state.code === code)!
 
 describe('normalizeText', () => {
   it('ignores case, accents and extra spaces', () => {
@@ -17,7 +19,9 @@ describe('normalizeText', () => {
   })
 })
 
-describe('checkAnswer', () => {
+describe('checkAnswer with flags', () => {
+  const saoPaulo = createFlagQuestion(stateOf('sp'))
+
   it('accepts state names typed without accents or in any case', () => {
     expect(checkAnswer(saoPaulo, 'São Paulo')).toBe('CORRECT')
     expect(checkAnswer(saoPaulo, 'sao paulo')).toBe('CORRECT')
@@ -31,7 +35,7 @@ describe('checkAnswer', () => {
   })
 
   it('tells similar names apart', () => {
-    const para = createFlagQuestion({ code: 'pa', name: 'Pará', capital: 'Belém' })
+    const para = createFlagQuestion(stateOf('pa'))
     expect(checkAnswer(para, 'para')).toBe('CORRECT')
     expect(checkAnswer(para, 'Paraná')).toBe('WRONG')
     expect(checkAnswer(para, 'Paraíba')).toBe('WRONG')
@@ -40,7 +44,9 @@ describe('checkAnswer', () => {
   it('treats a blank name as empty', () => {
     expect(checkAnswer(saoPaulo, '   ')).toBe('EMPTY')
   })
+})
 
+describe('checkAnswer with math', () => {
   it('keeps checking math answers as numbers', () => {
     const question = createPowerQuestion(2, 3)
     expect(checkAnswer(question, '8')).toBe('CORRECT')
@@ -51,7 +57,7 @@ describe('checkAnswer', () => {
 })
 
 describe('checkAnswer with abbreviations', () => {
-  const minas = createAbbreviationQuestion({ code: 'mg', name: 'Minas Gerais', capital: 'Belo Horizonte' })
+  const minas = createAbbreviationQuestion(stateOf('mg'))
 
   it('accepts the abbreviation in any case', () => {
     expect(checkAnswer(minas, 'MG')).toBe('CORRECT')
@@ -66,7 +72,7 @@ describe('checkAnswer with abbreviations', () => {
 })
 
 describe('checkAnswer with capitals', () => {
-  const santaCatarina = createCapitalQuestion({ code: 'sc', name: 'Santa Catarina', capital: 'Florianópolis' })
+  const santaCatarina = createCapitalQuestion(stateOf('sc'))
 
   it('accepts the capital without accents or in any case', () => {
     expect(checkAnswer(santaCatarina, 'Florianópolis')).toBe('CORRECT')
@@ -75,5 +81,42 @@ describe('checkAnswer with capitals', () => {
 
   it('rejects the state name', () => {
     expect(checkAnswer(santaCatarina, 'Santa Catarina')).toBe('WRONG')
+  })
+})
+
+describe('checkAnswer with capital demonyms', () => {
+  it('shows the capital and expects the main demonym', () => {
+    const salvador = createDemonymQuestion(stateOf('ba'))
+    expect(salvador.prompt).toBe('Salvador')
+    expect(salvador.answer).toBe('soteropolitano')
+  })
+
+  it('accepts the feminine form', () => {
+    const salvador = createDemonymQuestion(stateOf('ba'))
+    expect(checkAnswer(salvador, 'Soteropolitana')).toBe('CORRECT')
+  })
+
+  it('accepts the alternative official demonyms', () => {
+    expect(checkAnswer(createDemonymQuestion(stateOf('ba')), 'salvadorense')).toBe('CORRECT')
+    expect(checkAnswer(createDemonymQuestion(stateOf('am')), 'manauense')).toBe('CORRECT')
+    expect(checkAnswer(createDemonymQuestion(stateOf('ma')), 'são-luisense')).toBe('CORRECT')
+  })
+
+  it('ignores hyphens and spaces in compound demonyms', () => {
+    const beloHorizonte = createDemonymQuestion(stateOf('mg'))
+    expect(checkAnswer(beloHorizonte, 'belo-horizontino')).toBe('CORRECT')
+    expect(checkAnswer(beloHorizonte, 'belo horizontino')).toBe('CORRECT')
+    expect(checkAnswer(beloHorizonte, 'belohorizontina')).toBe('CORRECT')
+  })
+
+  it('does not invent a feminine form for demonyms that do not end in "o"', () => {
+    const rio = createDemonymQuestion(stateOf('rj'))
+    expect(checkAnswer(rio, 'carioca')).toBe('CORRECT')
+    expect(checkAnswer(rio, 'carioco')).toBe('WRONG')
+  })
+
+  it('rejects the state demonym when it differs from the capital one', () => {
+    expect(checkAnswer(createDemonymQuestion(stateOf('ba')), 'baiano')).toBe('WRONG')
+    expect(checkAnswer(createDemonymQuestion(stateOf('sp')), 'paulista')).toBe('WRONG')
   })
 })

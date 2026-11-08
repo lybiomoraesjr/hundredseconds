@@ -10,6 +10,7 @@ export const messages = {
     [GameMode.STATE_FLAGS]: 'Bandeiras',
     [GameMode.STATE_ABBREVIATIONS]: 'Siglas',
     [GameMode.STATE_CAPITALS]: 'Capitais',
+    [GameMode.CAPITAL_DEMONYMS]: 'Gentílicos',
   },
   modeSelectorLabel: 'Modalidade',
   summary: {
@@ -36,6 +37,8 @@ export const messages = {
     abbreviationAnswerPlaceholder: 'UF',
     capitalQuestion: 'Qual é a capital deste estado?',
     capitalAnswerPlaceholder: 'Nome da capital',
+    demonymQuestion: 'Qual é o gentílico de quem nasce nesta capital?',
+    demonymAnswerPlaceholder: 'Gentílico',
     starsLabel: (stars: number) => `${stars} de 10 estrelas`,
   },
   result: {

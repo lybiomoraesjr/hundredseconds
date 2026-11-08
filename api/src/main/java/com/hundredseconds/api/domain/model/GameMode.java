@@ -11,5 +11,7 @@ public enum GameMode {
 	/** Type the abbreviation of a Brazilian state. */
 	STATE_ABBREVIATIONS,
 	/** Type the capital of a Brazilian state. */
-	STATE_CAPITALS
+	STATE_CAPITALS,
+	/** Type the demonym of a Brazilian state capital. */
+	CAPITAL_DEMONYMS
 }

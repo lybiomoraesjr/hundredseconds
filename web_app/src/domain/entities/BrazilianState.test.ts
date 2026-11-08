@@ -13,6 +13,15 @@ describe('BRAZILIAN_STATES', () => {
     expect(new Set(BRAZILIAN_STATES.map((state) => state.capital)).size).toBe(27)
   })
 
+  it('has at least one lowercase demonym for every capital, without duplicates', () => {
+    const demonyms = BRAZILIAN_STATES.flatMap((state) => state.capitalDemonyms)
+    expect(BRAZILIAN_STATES.every((state) => state.capitalDemonyms.length > 0)).toBe(true)
+    expect(new Set(demonyms).size).toBe(demonyms.length)
+    for (const demonym of demonyms) {
+      expect(demonym).toBe(demonym.toLowerCase())
+    }
+  })
+
   it('uses lowercase two-letter codes', () => {
     for (const state of BRAZILIAN_STATES) {
       expect(state.code).toMatch(/^[a-z]{2}$/)

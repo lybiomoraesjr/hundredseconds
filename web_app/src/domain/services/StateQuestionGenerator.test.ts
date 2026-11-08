@@ -3,7 +3,12 @@ import { GameMode, type StateGameMode } from '../entities/GameMode'
 import { stateQuestionsFor } from './QuestionCatalog'
 import { QuestionGenerator } from './QuestionGenerator'
 
-const STATE_MODES: StateGameMode[] = [GameMode.STATE_FLAGS, GameMode.STATE_ABBREVIATIONS, GameMode.STATE_CAPITALS]
+const STATE_MODES: StateGameMode[] = [
+  GameMode.STATE_FLAGS,
+  GameMode.STATE_ABBREVIATIONS,
+  GameMode.STATE_CAPITALS,
+  GameMode.CAPITAL_DEMONYMS,
+]
 
 describe('QuestionGenerator with state games', () => {
   it('asks for the state name on flags and for the uppercase abbreviation on abbreviations', () => {
@@ -11,7 +16,7 @@ describe('QuestionGenerator with state games', () => {
     const abbreviation = stateQuestionsFor(GameMode.STATE_ABBREVIATIONS).find((question) => question.stateCode === 'mg')
     expect(flag?.answer).toBe('Minas Gerais')
     expect(abbreviation?.answer).toBe('MG')
-    expect(abbreviation?.stateName).toBe('Minas Gerais')
+    expect(abbreviation?.prompt).toBe('Minas Gerais')
   })
 
   it('asks for the capital on capitals, with Brasília for the Federal District', () => {

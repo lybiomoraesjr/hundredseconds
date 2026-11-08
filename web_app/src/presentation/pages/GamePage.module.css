@@ -58,8 +58,8 @@
   font-weight: 800;
 }
 
-/* State name asked in the abbreviations game; long names ("Rio Grande do Norte") wrap */
-.stateName {
+/* State or capital name asked in the text games; long names ("Rio Grande do Norte") wrap */
+.promptText {
   font-size: clamp(2rem, 9vw, 3.75rem);
   font-weight: 800;
   line-height: 1.1;

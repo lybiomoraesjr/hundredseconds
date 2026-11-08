@@ -2,7 +2,7 @@ import { Button, Center, Group, Stack, Text, TextInput } from '@mantine/core'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useGame } from '../../application/game/useGame'
 import type { FinishedMatch } from '../../application/ports/ScoreGateway'
-import { GameMode, isStateQuestion, type Question } from '../../domain'
+import { GameMode, isStateQuestion, type Question, type StateGameMode } from '../../domain'
 import { preloadFlags } from '../components/flagImages'
 import { GameBoard } from '../components/GameBoard'
 import { MathExpression } from '../components/MathExpression'
@@ -38,6 +38,14 @@ function answerInputFor(mode: GameMode): AnswerInputConfig {
         className: classes.textAnswer,
         inputMode: 'text',
         placeholder: messages.game.capitalAnswerPlaceholder,
+        autoCapitalize: 'off',
+        sanitize: (value) => value,
+      }
+    case GameMode.CAPITAL_DEMONYMS:
+      return {
+        className: classes.textAnswer,
+        inputMode: 'text',
+        placeholder: messages.game.demonymAnswerPlaceholder,
         autoCapitalize: 'off',
         sanitize: (value) => value,
       }
@@ -156,22 +164,28 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
   )
 }
 
+/** Question shown above the prompt text in the state games that display text (every one but flags). */
+const TEXT_PROMPT_QUESTIONS: Record<StateGameMode, string> = {
+  [GameMode.STATE_FLAGS]: messages.game.flagQuestion,
+  [GameMode.STATE_ABBREVIATIONS]: messages.game.abbreviationQuestion,
+  [GameMode.STATE_CAPITALS]: messages.game.capitalQuestion,
+  [GameMode.CAPITAL_DEMONYMS]: messages.game.demonymQuestion,
+}
+
 function QuestionPrompt({ question }: { question: Question }) {
   if (isStateQuestion(question)) {
     if (question.mode === GameMode.STATE_FLAGS) {
       return (
         <Stack align="center" gap="sm" data-testid="question">
-          <Text c="white" fw={600} size="lg">{messages.game.flagQuestion}</Text>
+          <Text c="white" fw={600} size="lg">{TEXT_PROMPT_QUESTIONS[question.mode]}</Text>
           <StateFlag stateCode={question.stateCode} />
         </Stack>
       )
     }
     return (
       <Stack align="center" gap="sm" data-testid="question">
-        <Text c="white" fw={600} size="lg">
-          {question.mode === GameMode.STATE_CAPITALS ? messages.game.capitalQuestion : messages.game.abbreviationQuestion}
-        </Text>
-        <Text className={classes.stateName} c="white" data-testid="state-name">{question.stateName}</Text>
+        <Text c="white" fw={600} size="lg" ta="center">{TEXT_PROMPT_QUESTIONS[question.mode]}</Text>
+        <Text className={classes.promptText} c="white" data-testid="prompt">{question.prompt}</Text>
       </Stack>
     )
   }
@@ -194,9 +208,9 @@ function RevealedAnswer({ question }: { question: Question }) {
     }
     return (
       <Stack align="center" gap={0}>
-        <Text className={classes.revealName}>{question.stateName}</Text>
-        {/* Capitals can be long ("Florianópolis"), so they use a smaller size than the two-letter abbreviation */}
-        <Text className={question.mode === GameMode.STATE_CAPITALS ? classes.revealLongAnswer : classes.revealExpression}
+        <Text className={classes.revealName}>{question.prompt}</Text>
+        {/* Names can be long ("Florianópolis"), so they use a smaller size than the two-letter abbreviation */}
+        <Text className={question.mode === GameMode.STATE_ABBREVIATIONS ? classes.revealExpression : classes.revealLongAnswer}
           data-testid="revealed-answer">{question.answer}</Text>
       </Stack>
     )

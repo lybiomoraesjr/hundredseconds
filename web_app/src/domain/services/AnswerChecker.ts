@@ -17,11 +17,16 @@ export function normalizeText(text: string): string {
     .trim()
 }
 
+/** Hyphens and spaces are ignored too ("belo horizontino" and "belohorizontino" match "belo-horizontino"). */
+function comparable(text: string): string {
+  return normalizeText(text).replace(/[\s-]/g, '')
+}
+
 export function checkAnswer(question: Question, input: string): AnswerCheck {
   if (isStateQuestion(question)) {
-    const typed = normalizeText(input)
+    const typed = comparable(input)
     if (typed === '') return 'EMPTY'
-    return typed === normalizeText(question.answer) ? 'CORRECT' : 'WRONG'
+    return question.acceptedAnswers.some((accepted) => comparable(accepted) === typed) ? 'CORRECT' : 'WRONG'
   }
   const answer = parseAnswer(input)
   if (answer === null) return 'EMPTY'

@@ -5,6 +5,7 @@ export const GameMode = {
   STATE_FLAGS: 'STATE_FLAGS',
   STATE_ABBREVIATIONS: 'STATE_ABBREVIATIONS',
   STATE_CAPITALS: 'STATE_CAPITALS',
+  CAPITAL_DEMONYMS: 'CAPITAL_DEMONYMS',
 } as const
 
 export type GameMode = (typeof GameMode)[keyof typeof GameMode]
@@ -12,11 +13,12 @@ export type GameMode = (typeof GameMode)[keyof typeof GameMode]
 /** Modes whose questions are math expressions with a numeric answer. */
 export type MathGameMode = typeof GameMode.EXPONENTIATION | typeof GameMode.ROOT_EXTRACTION
 
-/** Modes that ask something about a Brazilian state; the answer is typed as text. */
+/** Modes that ask something about a Brazilian state (or its capital); the answer is typed as text. */
 export type StateGameMode =
   | typeof GameMode.STATE_FLAGS
   | typeof GameMode.STATE_ABBREVIATIONS
   | typeof GameMode.STATE_CAPITALS
+  | typeof GameMode.CAPITAL_DEMONYMS
 
 export function isMathMode(mode: GameMode): mode is MathGameMode {
   return mode === GameMode.EXPONENTIATION || mode === GameMode.ROOT_EXTRACTION
