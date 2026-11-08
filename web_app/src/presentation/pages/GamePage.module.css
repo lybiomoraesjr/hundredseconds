@@ -74,6 +74,16 @@
   overflow-wrap: anywhere;
 }
 
+.mapPlaceholder {
+  width: clamp(13rem, 64vw, 22rem);
+  aspect-ratio: 613 / 639;
+}
+
+.mapPlaceholderLarge {
+  width: clamp(16rem, 80vw, 26rem);
+  aspect-ratio: 613 / 639;
+}
+
 .revealName {
   font-size: clamp(2rem, 8vw, 3.5rem);
   font-weight: 800;

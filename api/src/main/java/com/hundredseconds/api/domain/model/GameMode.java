@@ -13,5 +13,7 @@ public enum GameMode {
 	/** Type the capital of a Brazilian state. */
 	STATE_CAPITALS,
 	/** Type the demonym of a Brazilian state capital. */
-	CAPITAL_DEMONYMS
+	CAPITAL_DEMONYMS,
+	/** Name the Brazilian state highlighted on the map. */
+	STATE_MAP
 }

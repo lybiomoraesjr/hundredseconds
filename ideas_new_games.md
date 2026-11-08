@@ -2,7 +2,7 @@
 
 > Rascunho de ideias, ainda não é especificação. Data: 2026-11-07.
 >
-> **Bandeiras, Siglas, Capitais e Gentílicos das capitais: implementados** (2026-11-08). As regras estão na seção 2.1 de `requirements_specification_100_seconds_game.md`: 100 s, pontuação por acertos e uma única tentativa.
+> **Todos os jogos desta lista foram implementados** (2026-11-08). "Estados brasileiros" virou o jogo do mapa (estado destacado → nome). As regras estão na seção 2.1 de `requirements_specification_100_seconds_game.md`: 100 s, pontuação por acertos e uma única tentativa.
 
 ## Jogos
 

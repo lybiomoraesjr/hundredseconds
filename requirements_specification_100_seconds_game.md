@@ -24,7 +24,7 @@ O objetivo deste projeto é desenvolver uma aplicação web de perguntas e respo
 ## 2. Regras de Negócio e Mecânicas de Jogo (Game Design)
 
 ### 2.1. Modalidades de Jogo
-Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma entre seis modalidades (exibidas como *chips* que quebram linha em telas pequenas):
+Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma entre sete modalidades (exibidas como *chips* que quebram linha em telas pequenas):
 1. **Apenas Potenciação:** Questões no formato $a^n = ?$
 2. **Apenas Radiciação:** Questões no formato $\sqrt[n]{a} = ?$
 3. **Bandeiras dos estados** (`STATE_FLAGS`): aparece a bandeira de um estado brasileiro (26 estados + DF) e o jogador digita o nome do estado. Regras próprias:
@@ -40,6 +40,7 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
    * A forma feminina é aceita para gentílicos terminados em "o" ("soteropolitana").
    * Formas alternativas oficiais também valem: manauara/manauense, soteropolitano/salvadorense, ludovicense/são-luisense, aracajuano/aracajuense. Ao errar, a primeira forma é a exibida.
    * Gentílicos do estado não valem quando diferem do da capital (Salvador ≠ "baiano", São Paulo ≠ "paulista"). Apelidos informais (manezinho, papa-jerimum) e "capixaba" para Vitória também não.
+7. **Estados no mapa** (`STATE_MAP`, rótulo "Estados"): aparece o mapa do Brasil com um estado destacado e o jogador digita o nome do estado. Mesmas regras das Bandeiras. Estados pequenos demais para ver (DF, SE, AL) ganham um círculo em volta. O mapa vem de `@svg-maps/brazil` (Victor Cazanave, baseado no MapSVG, licença **CC BY 4.0**); o crédito aparece abaixo do mapa, como a licença exige. Os dados ficam em `brazilMapData.ts`, gerado por `web_app/scripts/generate_brazil_map.py`, e só são baixados por quem joga esse modo.
 
 *(Nota: Os rankings e recordes devem ser registrados e exibidos separadamente para cada modalidade).*
 

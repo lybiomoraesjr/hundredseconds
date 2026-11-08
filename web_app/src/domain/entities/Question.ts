@@ -20,12 +20,13 @@ export interface MathQuestion {
  * - Abbreviations: shows the state name, the answer is its abbreviation ("MG")
  * - Capitals: shows the state name, the answer is its capital
  * - Capital demonyms: shows the capital, the answer is its demonym ("soteropolitano")
+ * - Map: highlights the state on the map of Brazil, the answer is the state name
  */
 export interface StateQuestion {
   readonly id: string
   readonly mode: StateGameMode
   readonly stateCode: string
-  /** Text shown to the player (unused by flags, which show the image). */
+  /** Text shown to the player (unused by flags and map, which show an image). */
   readonly prompt: string
   /** Main answer, shown when the player misses. */
   readonly answer: string
@@ -70,6 +71,10 @@ function stateQuestion(mode: StateGameMode, idPrefix: string, state: BrazilianSt
 
 export function createFlagQuestion(state: BrazilianState): StateQuestion {
   return stateQuestion(GameMode.STATE_FLAGS, 'flag', state, state.name, state.name)
+}
+
+export function createMapQuestion(state: BrazilianState): StateQuestion {
+  return stateQuestion(GameMode.STATE_MAP, 'map', state, state.name, state.name)
 }
 
 export function createAbbreviationQuestion(state: BrazilianState): StateQuestion {

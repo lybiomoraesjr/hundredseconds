@@ -1,8 +1,9 @@
-import { Button, Center, Group, Stack, Text, TextInput } from '@mantine/core'
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { Anchor, Button, Center, Group, Stack, Text, TextInput } from '@mantine/core'
+import { Suspense, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useGame } from '../../application/game/useGame'
 import type { FinishedMatch } from '../../application/ports/ScoreGateway'
 import { GameMode, isStateQuestion, type Question, type StateGameMode } from '../../domain'
+import { LazyBrazilMap, preloadBrazilMap } from '../components/brazilMapLoader'
 import { preloadFlags } from '../components/flagImages'
 import { GameBoard } from '../components/GameBoard'
 import { MathExpression } from '../components/MathExpression'
@@ -26,6 +27,7 @@ interface AnswerInputConfig {
 function answerInputFor(mode: GameMode): AnswerInputConfig {
   switch (mode) {
     case GameMode.STATE_FLAGS:
+    case GameMode.STATE_MAP:
       return {
         className: classes.textAnswer,
         inputMode: 'text',
@@ -80,10 +82,11 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
   const isFlagGame = mode === GameMode.STATE_FLAGS
   const input = answerInputFor(mode)
 
-  // Flags are downloaded during the countdown, so none of them pops in late
+  // Images are downloaded during the countdown, so none of them pops in late
   useEffect(() => {
     if (isFlagGame) preloadFlags()
-  }, [isFlagGame])
+    if (mode === GameMode.STATE_MAP) preloadBrazilMap()
+  }, [isFlagGame, mode])
 
   // Keep the cursor in the answer box all the time
   useEffect(() => {
@@ -170,10 +173,33 @@ const TEXT_PROMPT_QUESTIONS: Record<StateGameMode, string> = {
   [GameMode.STATE_ABBREVIATIONS]: messages.game.abbreviationQuestion,
   [GameMode.STATE_CAPITALS]: messages.game.capitalQuestion,
   [GameMode.CAPITAL_DEMONYMS]: messages.game.demonymQuestion,
+  [GameMode.STATE_MAP]: messages.game.mapQuestion,
+}
+
+/** Keeps the space of the map while its code is still downloading, so the layout does not jump. */
+function BrazilMapView({ stateCode, size }: { stateCode: string; size?: 'md' | 'lg' }) {
+  return (
+    <Suspense fallback={<div className={size === 'lg' ? classes.mapPlaceholderLarge : classes.mapPlaceholder} />}>
+      <LazyBrazilMap highlightedCode={stateCode} size={size} />
+    </Suspense>
+  )
 }
 
 function QuestionPrompt({ question }: { question: Question }) {
   if (isStateQuestion(question)) {
+    if (question.mode === GameMode.STATE_MAP) {
+      return (
+        <Stack align="center" gap="xs" data-testid="question">
+          <Text c="white" fw={600} size="lg" ta="center">{TEXT_PROMPT_QUESTIONS[question.mode]}</Text>
+          <BrazilMapView stateCode={question.stateCode} />
+          {/* Credit required by the CC BY 4.0 license of the map */}
+          <Anchor href="https://mapsvg.com/maps/brazil" target="_blank" rel="noreferrer" c="white" size="xs"
+            opacity={0.8} tabIndex={-1}>
+            {messages.game.mapCredit}
+          </Anchor>
+        </Stack>
+      )
+    }
     if (question.mode === GameMode.STATE_FLAGS) {
       return (
         <Stack align="center" gap="sm" data-testid="question">
@@ -198,6 +224,14 @@ function QuestionPrompt({ question }: { question: Question }) {
 
 function RevealedAnswer({ question }: { question: Question }) {
   if (isStateQuestion(question)) {
+    if (question.mode === GameMode.STATE_MAP) {
+      return (
+        <Stack align="center" gap="md">
+          <BrazilMapView stateCode={question.stateCode} size="lg" />
+          <Text className={classes.revealName} data-testid="revealed-answer">{question.answer}</Text>
+        </Stack>
+      )
+    }
     if (question.mode === GameMode.STATE_FLAGS) {
       return (
         <Stack align="center" gap="md">

@@ -1,0 +1,30 @@
+/* Same proportion as the map viewBox (613 x 639) */
+.map {
+  display: block;
+  width: clamp(13rem, 64vw, 22rem);
+  aspect-ratio: 613 / 639;
+}
+
+.large {
+  width: clamp(16rem, 80vw, 26rem);
+}
+
+.state {
+  fill: rgb(255 255 255 / 0.9);
+  stroke: var(--mantine-color-orange-8);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.highlighted {
+  fill: var(--mantine-color-blue-8);
+  stroke: var(--mantine-color-white);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.ring {
+  fill: none;
+  stroke: var(--mantine-color-blue-8);
+  stroke-width: 5;
+}

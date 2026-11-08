@@ -8,6 +8,7 @@ const STATE_MODES: StateGameMode[] = [
   GameMode.STATE_ABBREVIATIONS,
   GameMode.STATE_CAPITALS,
   GameMode.CAPITAL_DEMONYMS,
+  GameMode.STATE_MAP,
 ]
 
 describe('QuestionGenerator with state games', () => {

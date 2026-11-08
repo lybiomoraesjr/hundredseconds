@@ -11,6 +11,7 @@ export const messages = {
     [GameMode.STATE_ABBREVIATIONS]: 'Siglas',
     [GameMode.STATE_CAPITALS]: 'Capitais',
     [GameMode.CAPITAL_DEMONYMS]: 'Gentílicos',
+    [GameMode.STATE_MAP]: 'Estados',
   },
   modeSelectorLabel: 'Modalidade',
   summary: {
@@ -39,6 +40,10 @@ export const messages = {
     capitalAnswerPlaceholder: 'Nome da capital',
     demonymQuestion: 'Qual é o gentílico de quem nasce nesta capital?',
     demonymAnswerPlaceholder: 'Gentílico',
+    mapQuestion: 'Qual é o estado destacado no mapa?',
+    // Must not reveal the answer
+    mapAlt: 'Mapa do Brasil com um estado destacado',
+    mapCredit: 'Mapa: MapSVG / Victor Cazanave (CC BY 4.0)',
     starsLabel: (stars: number) => `${stars} de 10 estrelas`,
   },
   result: {

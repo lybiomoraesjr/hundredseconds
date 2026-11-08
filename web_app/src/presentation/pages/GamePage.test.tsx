@@ -306,4 +306,36 @@ describe('GamePage', () => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
   })
+
+  describe('map', () => {
+    const mapName = 'Mapa do Brasil com um estado destacado'
+    const currentState = async () => {
+      const map = await screen.findByRole('img', { name: mapName })
+      return BRAZILIAN_STATES.find((state) => state.code === map.getAttribute('data-state'))!
+    }
+
+    it('highlights a state on the map and accepts its name', async () => {
+      const { user } = setup(GameMode.STATE_MAP)
+      await skipCountdown()
+      expect(screen.getByText('Qual é o estado destacado no mapa?')).toBeInTheDocument()
+      expect(screen.getByText('Mapa: MapSVG / Victor Cazanave (CC BY 4.0)')).toBeInTheDocument()
+      const state = await currentState()
+
+      await user.type(screen.getByLabelText('Sua resposta'), `${state.name}{Enter}`)
+
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+    })
+
+    it('reveals the state name on the map after the first mistake', async () => {
+      const { user } = setup(GameMode.STATE_MAP)
+      await skipCountdown()
+      const state = await currentState()
+
+      await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
+
+      expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.name)
+      await advance(1500)
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+  })
 })

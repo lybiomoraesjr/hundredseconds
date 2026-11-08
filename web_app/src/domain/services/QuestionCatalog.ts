@@ -6,6 +6,7 @@ import {
   createCapitalQuestion,
   createDemonymQuestion,
   createFlagQuestion,
+  createMapQuestion,
   createPowerQuestion,
   createRootQuestion,
   type MathQuestion,
@@ -86,6 +87,7 @@ const STATE_QUESTIONS: Record<StateGameMode, readonly StateQuestion[]> = {
   [GameMode.STATE_ABBREVIATIONS]: BRAZILIAN_STATES.map(createAbbreviationQuestion),
   [GameMode.STATE_CAPITALS]: BRAZILIAN_STATES.map(createCapitalQuestion),
   [GameMode.CAPITAL_DEMONYMS]: BRAZILIAN_STATES.map(createDemonymQuestion),
+  [GameMode.STATE_MAP]: BRAZILIAN_STATES.map(createMapQuestion),
 }
 
 export function stateQuestionsFor(mode: StateGameMode): readonly StateQuestion[] {
