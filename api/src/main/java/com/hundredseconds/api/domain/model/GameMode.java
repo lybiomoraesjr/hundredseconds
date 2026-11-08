@@ -9,5 +9,7 @@ public enum GameMode {
 	/** Guess the Brazilian state from its flag. */
 	STATE_FLAGS,
 	/** Type the abbreviation of a Brazilian state. */
-	STATE_ABBREVIATIONS
+	STATE_ABBREVIATIONS,
+	/** Type the capital of a Brazilian state. */
+	STATE_CAPITALS
 }

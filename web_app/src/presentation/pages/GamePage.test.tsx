@@ -246,4 +246,35 @@ describe('GamePage', () => {
       expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 0')
     })
   })
+
+  describe('capitals', () => {
+    const currentState = () =>
+      BRAZILIAN_STATES.find((state) => state.name === screen.getByTestId('state-name').textContent)!
+
+    it('shows a state name and accepts its capital without accents', async () => {
+      const { user } = setup(GameMode.STATE_CAPITALS)
+      await skipCountdown()
+      expect(screen.getByText('Qual é a capital deste estado?')).toBeInTheDocument()
+      const input = screen.getByLabelText('Sua resposta')
+      expect(input).toHaveAttribute('placeholder', 'Nome da capital')
+
+      const typed = currentState().capital.normalize('NFD').replace(/\p{Diacritic}/gu, '').toUpperCase()
+      await user.type(input, `${typed}{Enter}`)
+
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+    })
+
+    it('reveals the state and its capital after the first mistake', async () => {
+      const { user } = setup(GameMode.STATE_CAPITALS)
+      await skipCountdown()
+      const state = currentState()
+
+      await user.type(screen.getByLabelText('Sua resposta'), 'Atlântida{Enter}')
+
+      expect(screen.getByRole('alert')).toHaveTextContent(state.name)
+      expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.capital)
+      await advance(1500)
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    })
+  })
 })

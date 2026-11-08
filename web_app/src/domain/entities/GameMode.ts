@@ -4,6 +4,7 @@ export const GameMode = {
   ROOT_EXTRACTION: 'ROOT_EXTRACTION',
   STATE_FLAGS: 'STATE_FLAGS',
   STATE_ABBREVIATIONS: 'STATE_ABBREVIATIONS',
+  STATE_CAPITALS: 'STATE_CAPITALS',
 } as const
 
 export type GameMode = (typeof GameMode)[keyof typeof GameMode]
@@ -12,7 +13,10 @@ export type GameMode = (typeof GameMode)[keyof typeof GameMode]
 export type MathGameMode = typeof GameMode.EXPONENTIATION | typeof GameMode.ROOT_EXTRACTION
 
 /** Modes that ask something about a Brazilian state; the answer is typed as text. */
-export type StateGameMode = typeof GameMode.STATE_FLAGS | typeof GameMode.STATE_ABBREVIATIONS
+export type StateGameMode =
+  | typeof GameMode.STATE_FLAGS
+  | typeof GameMode.STATE_ABBREVIATIONS
+  | typeof GameMode.STATE_CAPITALS
 
 export function isMathMode(mode: GameMode): mode is MathGameMode {
   return mode === GameMode.EXPONENTIATION || mode === GameMode.ROOT_EXTRACTION

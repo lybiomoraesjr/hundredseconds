@@ -10,6 +10,7 @@ describe('BRAZILIAN_STATES', () => {
     expect(BRAZILIAN_STATES).toHaveLength(27)
     expect(new Set(BRAZILIAN_STATES.map((state) => state.code)).size).toBe(27)
     expect(new Set(BRAZILIAN_STATES.map((state) => state.name)).size).toBe(27)
+    expect(new Set(BRAZILIAN_STATES.map((state) => state.capital)).size).toBe(27)
   })
 
   it('uses lowercase two-letter codes', () => {

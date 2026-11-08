@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { createAbbreviationQuestion, createFlagQuestion, createPowerQuestion } from '../entities/Question'
+import {
+  createAbbreviationQuestion,
+  createCapitalQuestion,
+  createFlagQuestion,
+  createPowerQuestion,
+} from '../entities/Question'
 import { checkAnswer, normalizeText } from './AnswerChecker'
 
-const saoPaulo = createFlagQuestion({ code: 'sp', name: 'São Paulo' })
+const saoPaulo = createFlagQuestion({ code: 'sp', name: 'São Paulo', capital: 'São Paulo' })
 
 describe('normalizeText', () => {
   it('ignores case, accents and extra spaces', () => {
@@ -26,7 +31,7 @@ describe('checkAnswer', () => {
   })
 
   it('tells similar names apart', () => {
-    const para = createFlagQuestion({ code: 'pa', name: 'Pará' })
+    const para = createFlagQuestion({ code: 'pa', name: 'Pará', capital: 'Belém' })
     expect(checkAnswer(para, 'para')).toBe('CORRECT')
     expect(checkAnswer(para, 'Paraná')).toBe('WRONG')
     expect(checkAnswer(para, 'Paraíba')).toBe('WRONG')
@@ -46,7 +51,7 @@ describe('checkAnswer', () => {
 })
 
 describe('checkAnswer with abbreviations', () => {
-  const minas = createAbbreviationQuestion({ code: 'mg', name: 'Minas Gerais' })
+  const minas = createAbbreviationQuestion({ code: 'mg', name: 'Minas Gerais', capital: 'Belo Horizonte' })
 
   it('accepts the abbreviation in any case', () => {
     expect(checkAnswer(minas, 'MG')).toBe('CORRECT')
@@ -57,5 +62,18 @@ describe('checkAnswer with abbreviations', () => {
   it('rejects other abbreviations and the state name', () => {
     expect(checkAnswer(minas, 'MS')).toBe('WRONG')
     expect(checkAnswer(minas, 'Minas Gerais')).toBe('WRONG')
+  })
+})
+
+describe('checkAnswer with capitals', () => {
+  const santaCatarina = createCapitalQuestion({ code: 'sc', name: 'Santa Catarina', capital: 'Florianópolis' })
+
+  it('accepts the capital without accents or in any case', () => {
+    expect(checkAnswer(santaCatarina, 'Florianópolis')).toBe('CORRECT')
+    expect(checkAnswer(santaCatarina, 'florianopolis')).toBe('CORRECT')
+  })
+
+  it('rejects the state name', () => {
+    expect(checkAnswer(santaCatarina, 'Santa Catarina')).toBe('WRONG')
   })
 })

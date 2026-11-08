@@ -33,6 +33,14 @@ function answerInputFor(mode: GameMode): AnswerInputConfig {
         autoCapitalize: 'off',
         sanitize: (value) => value,
       }
+    case GameMode.STATE_CAPITALS:
+      return {
+        className: classes.textAnswer,
+        inputMode: 'text',
+        placeholder: messages.game.capitalAnswerPlaceholder,
+        autoCapitalize: 'off',
+        sanitize: (value) => value,
+      }
     case GameMode.STATE_ABBREVIATIONS:
       return {
         inputMode: 'text',
@@ -160,7 +168,9 @@ function QuestionPrompt({ question }: { question: Question }) {
     }
     return (
       <Stack align="center" gap="sm" data-testid="question">
-        <Text c="white" fw={600} size="lg">{messages.game.abbreviationQuestion}</Text>
+        <Text c="white" fw={600} size="lg">
+          {question.mode === GameMode.STATE_CAPITALS ? messages.game.capitalQuestion : messages.game.abbreviationQuestion}
+        </Text>
         <Text className={classes.stateName} c="white" data-testid="state-name">{question.stateName}</Text>
       </Stack>
     )
@@ -185,7 +195,9 @@ function RevealedAnswer({ question }: { question: Question }) {
     return (
       <Stack align="center" gap={0}>
         <Text className={classes.revealName}>{question.stateName}</Text>
-        <Text className={classes.revealExpression} data-testid="revealed-answer">{question.answer}</Text>
+        {/* Capitals can be long ("Florianópolis"), so they use a smaller size than the two-letter abbreviation */}
+        <Text className={question.mode === GameMode.STATE_CAPITALS ? classes.revealLongAnswer : classes.revealExpression}
+          data-testid="revealed-answer">{question.answer}</Text>
       </Stack>
     )
   }

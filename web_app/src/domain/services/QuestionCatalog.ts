@@ -3,6 +3,7 @@ import { BRAZILIAN_STATES } from '../entities/BrazilianState'
 import { GameMode, type MathGameMode, type StateGameMode } from '../entities/GameMode'
 import {
   createAbbreviationQuestion,
+  createCapitalQuestion,
   createFlagQuestion,
   createPowerQuestion,
   createRootQuestion,
@@ -82,6 +83,7 @@ export function questionsBelow(mode: MathGameMode, level: DifficultyLevel): read
 const STATE_QUESTIONS: Record<StateGameMode, readonly StateQuestion[]> = {
   [GameMode.STATE_FLAGS]: BRAZILIAN_STATES.map(createFlagQuestion),
   [GameMode.STATE_ABBREVIATIONS]: BRAZILIAN_STATES.map(createAbbreviationQuestion),
+  [GameMode.STATE_CAPITALS]: BRAZILIAN_STATES.map(createCapitalQuestion),
 }
 
 export function stateQuestionsFor(mode: StateGameMode): readonly StateQuestion[] {

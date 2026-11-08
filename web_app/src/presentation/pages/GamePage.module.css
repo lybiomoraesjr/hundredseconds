@@ -67,6 +67,13 @@
   overflow-wrap: anywhere;
 }
 
+.revealLongAnswer {
+  font-size: clamp(2.5rem, 11vw, 5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
 .revealName {
   font-size: clamp(2rem, 8vw, 3.5rem);
   font-weight: 800;

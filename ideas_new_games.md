@@ -2,7 +2,7 @@
 
 > Rascunho de ideias, ainda não é especificação. Data: 2026-11-07.
 >
-> **Bandeiras dos estados e Siglas dos estados: implementados** (2026-11-08). As regras estão na seção 2.1 de `requirements_specification_100_seconds_game.md`: 100 s, pontuação por acertos e uma única tentativa.
+> **Bandeiras, Siglas e Capitais dos estados: implementados** (2026-11-08). As regras estão na seção 2.1 de `requirements_specification_100_seconds_game.md`: 100 s, pontuação por acertos e uma única tentativa.
 
 ## Jogos
 

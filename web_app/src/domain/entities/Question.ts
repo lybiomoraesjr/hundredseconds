@@ -18,6 +18,7 @@ export interface MathQuestion {
  * A question about a Brazilian state, answered with text.
  * - Flags: shows the state flag, the answer is the state name
  * - Abbreviations: shows the state name, the answer is its abbreviation ("MG")
+ * - Capitals: shows the state name, the answer is its capital
  */
 export interface StateQuestion {
   readonly id: string
@@ -74,5 +75,15 @@ export function createAbbreviationQuestion(state: BrazilianState): StateQuestion
     stateCode: state.code,
     stateName: state.name,
     answer: state.code.toUpperCase(),
+  }
+}
+
+export function createCapitalQuestion(state: BrazilianState): StateQuestion {
+  return {
+    id: `capital:${state.code}`,
+    mode: GameMode.STATE_CAPITALS,
+    stateCode: state.code,
+    stateName: state.name,
+    answer: state.capital,
   }
 }
