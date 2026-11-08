@@ -97,6 +97,37 @@ describe('GamePage', () => {
     expect(input).toHaveValue('12')
   })
 
+  it('beeps on each countdown second and plays a different sound when the match starts', async () => {
+    const { services } = setup()
+    expect(services.beeper.countdownTick).toHaveBeenCalledTimes(1)
+    await advance(1000)
+    expect(services.beeper.countdownTick).toHaveBeenCalledTimes(2)
+    await advance(1000)
+    expect(services.beeper.countdownTick).toHaveBeenCalledTimes(3)
+    expect(services.beeper.start).not.toHaveBeenCalled()
+
+    await advance(1000)
+    expect(services.beeper.start).toHaveBeenCalledTimes(1)
+    expect(services.beeper.countdownTick).toHaveBeenCalledTimes(3)
+
+    await advance(5000)
+    expect(services.beeper.start).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps the clock running while the answer is revealed, so that second is lost', async () => {
+    const { user } = setup()
+    await skipCountdown()
+    expect(screen.getByText('Tempo: 100')).toBeInTheDocument()
+
+    await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer() + 1}{Enter}`)
+    await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer() + 1}{Enter}`)
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+
+    await advance(1000)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.getByText('Tempo: 99')).toBeInTheDocument()
+  })
+
   it('beeps once at 10 seconds left and reports the match at the end', async () => {
     const { user, services, onFinished } = setup(GameMode.EXPONENTIATION)
     await skipCountdown()
@@ -104,13 +135,13 @@ describe('GamePage', () => {
     await user.type(screen.getByLabelText('Sua resposta'), `${currentAnswer() + 1}{Enter}`)
 
     await advance(89_000)
-    expect(services.beeper.beep).not.toHaveBeenCalled()
+    expect(services.beeper.warning).not.toHaveBeenCalled()
     await advance(1_000)
     expect(screen.getByText('Tempo: 10')).toBeInTheDocument()
-    expect(services.beeper.beep).toHaveBeenCalledTimes(1)
+    expect(services.beeper.warning).toHaveBeenCalledTimes(1)
 
     await advance(10_000)
-    expect(services.beeper.beep).toHaveBeenCalledTimes(1)
+    expect(services.beeper.warning).toHaveBeenCalledTimes(1)
     expect(onFinished).toHaveBeenCalledTimes(1)
     expect(onFinished).toHaveBeenCalledWith({ mode: GameMode.EXPONENTIATION, score: 1, wrongAnswers: 1 })
   })

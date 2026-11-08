@@ -1,10 +1,18 @@
 import type { Beeper } from '../../application/ports/Beeper'
 
-const FREQUENCY_HZ = 880
-const DURATION_SECONDS = 0.35
-const VOLUME = 0.2
+interface Tone {
+  readonly frequencyHz: number
+  readonly durationSeconds: number
+  readonly volume: number
+  readonly type: OscillatorType
+}
 
-/** Synthesizes a short beep with the Web Audio API (no audio file needed). */
+const COUNTDOWN_TONE: Tone = { frequencyHz: 660, durationSeconds: 0.15, volume: 0.2, type: 'sine' }
+// Higher and longer, so the start is clearly different from the countdown
+const START_TONE: Tone = { frequencyHz: 1320, durationSeconds: 0.5, volume: 0.25, type: 'square' }
+const WARNING_TONE: Tone = { frequencyHz: 880, durationSeconds: 0.35, volume: 0.2, type: 'sine' }
+
+/** Synthesizes the game sounds with the Web Audio API (no audio files needed). */
 export class WebAudioBeeper implements Beeper {
   private context: AudioContext | null = null
 
@@ -18,17 +26,29 @@ export class WebAudioBeeper implements Beeper {
     }
   }
 
-  beep(): void {
+  countdownTick(): void {
+    this.play(COUNTDOWN_TONE)
+  }
+
+  start(): void {
+    this.play(START_TONE)
+  }
+
+  warning(): void {
+    this.play(WARNING_TONE)
+  }
+
+  private play(tone: Tone): void {
     const context = this.context
     if (!context) return
     const oscillator = context.createOscillator()
     const gain = context.createGain()
-    oscillator.type = 'sine'
-    oscillator.frequency.value = FREQUENCY_HZ
-    gain.gain.setValueAtTime(VOLUME, context.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + DURATION_SECONDS)
+    oscillator.type = tone.type
+    oscillator.frequency.value = tone.frequencyHz
+    gain.gain.setValueAtTime(tone.volume, context.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + tone.durationSeconds)
     oscillator.connect(gain).connect(context.destination)
     oscillator.start()
-    oscillator.stop(context.currentTime + DURATION_SECONDS)
+    oscillator.stop(context.currentTime + tone.durationSeconds)
   }
 }

@@ -41,7 +41,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
     scoreGateway: createFakeGateway(),
     authGateway: createFakeAuthGateway(),
     sessionStore: createMemorySessionStore(),
-    beeper: { unlock: vi.fn(), beep: vi.fn() },
+    beeper: { unlock: vi.fn(), countdownTick: vi.fn(), start: vi.fn(), warning: vi.fn() },
     questionGenerator: new QuestionGenerator(),
     now: () => Date.now(),
     ...overrides,

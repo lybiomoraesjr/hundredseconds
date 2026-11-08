@@ -49,6 +49,7 @@ describe('App', () => {
 
     await user.click(screen.getByRole('button', { name: 'Início' }))
     expect(services.beeper.unlock).toHaveBeenCalled()
+    expect(services.beeper.countdownTick).toHaveBeenCalled()
 
     await advanceTime(3_000 + 100_100, 500)
 

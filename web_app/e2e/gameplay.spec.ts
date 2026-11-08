@@ -2,7 +2,24 @@ import { expect, test } from '@playwright/test'
 import { answerCorrectly, answerWrong, currentAnswer, finishMatch, openGame, startMatch } from './support/game'
 
 test.describe('Gameplay', () => {
-  test.beforeEach(async ({ page }) => openGame(page))
+  test.beforeEach(async ({ page }) => {
+    // Records the frequency of every tone the game synthesizes
+    await page.addInitScript(() => {
+      const tones: number[] = []
+      Object.assign(window, { __tones: tones })
+      const original = AudioContext.prototype.createOscillator
+      AudioContext.prototype.createOscillator = function (this: AudioContext) {
+        const oscillator = original.call(this)
+        const start = oscillator.start.bind(oscillator)
+        oscillator.start = (...args: Parameters<OscillatorNode['start']>) => {
+          tones.push(oscillator.frequency.value)
+          start(...args)
+        }
+        return oscillator
+      }
+    })
+    await openGame(page)
+  })
 
   test('counts correct answers, gives stars and keeps the focus', async ({ page }) => {
     await startMatch(page)
@@ -32,6 +49,17 @@ test.describe('Gameplay', () => {
     await expect(page.getByRole('alert')).toBeHidden()
     await expect(page.getByLabel('Sua resposta')).toBeFocused()
     await expect(page.getByText('Resultado: 0')).toBeVisible()
+    // The clock kept running during the reveal: that second is lost
+    await expect(page.getByText('Tempo: 99')).toBeVisible()
+  })
+
+  test('plays a beep on each countdown second and a different sound at the start', async ({ page }) => {
+    await startMatch(page)
+    await page.clock.runFor(2000)
+
+    const tones = await page.evaluate(() => (window as unknown as { __tones: number[] }).__tones)
+    // 3, 2, 1 at 660 Hz, then the start sound at 1320 Hz, and nothing else yet
+    expect(tones).toEqual([660, 660, 660, 1320])
   })
 
   test('shows the result with score, stars and wrong answers after 100 seconds', async ({ page }) => {

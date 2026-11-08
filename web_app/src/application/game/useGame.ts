@@ -8,7 +8,7 @@ const TIMER_INTERVAL_MS = 100
 const COUNTDOWN_STEP_MS = 1000
 
 /**
- * Runs a match: countdown, 100 second timer, answer reveal delay, warning beep and end of game.
+ * Runs a match: countdown (with sounds), 100 second timer, answer reveal delay, warning beep and end of game.
  */
 export function useGame(mode: GameMode, onFinished: (match: FinishedMatch) => void) {
   const { questionGenerator, beeper, now } = useAppServices()
@@ -27,6 +27,22 @@ export function useGame(mode: GameMode, onFinished: (match: FinishedMatch) => vo
     return () => clearTimeout(timeout)
   }, [status, countdown, now])
 
+  // One beep for each countdown number (3, 2, 1). The ref prevents repeats when effects re-run (StrictMode)
+  const lastCountdownBeep = useRef<number | null>(null)
+  useEffect(() => {
+    if (status !== 'COUNTDOWN' || lastCountdownBeep.current === countdown) return
+    lastCountdownBeep.current = countdown
+    beeper.countdownTick()
+  }, [status, countdown, beeper])
+
+  // Different sound when the match starts
+  const startSoundPlayed = useRef(false)
+  useEffect(() => {
+    if (status !== 'PLAYING' || startSoundPlayed.current) return
+    startSoundPlayed.current = true
+    beeper.start()
+  }, [status, beeper])
+
   // Game clock (time is always computed from the start instant, so drift does not accumulate)
   useEffect(() => {
     if (status !== 'PLAYING') return
@@ -34,7 +50,8 @@ export function useGame(mode: GameMode, onFinished: (match: FinishedMatch) => vo
     return () => clearInterval(interval)
   }, [status, now])
 
-  // Correct answer stays on screen for one second after the second mistake
+  // Correct answer stays on screen for one second after the second mistake.
+  // The game clock keeps running meanwhile, so the player really loses that second.
   useEffect(() => {
     if (phase !== 'REVEALING_ANSWER' || status !== 'PLAYING') return
     const timeout = setTimeout(() => dispatch({ type: 'FINISH_REVEAL' }), GameRules.REVEAL_DURATION_MS)
@@ -45,7 +62,7 @@ export function useGame(mode: GameMode, onFinished: (match: FinishedMatch) => vo
   const previousSecondsLeft = useRef(secondsLeft)
   useEffect(() => {
     if (shouldPlayWarning(previousSecondsLeft.current, secondsLeft)) {
-      beeper.beep()
+      beeper.warning()
     }
     previousSecondsLeft.current = secondsLeft
   }, [secondsLeft, beeper])

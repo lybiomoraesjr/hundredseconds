@@ -31,7 +31,7 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
 *(Nota: Os rankings e recordes devem ser registrados e exibidos separadamente para cada modalidade).*
 
 ### 2.2. Fluxo da Partida e Tempo
-* **Contagem Regressiva Inicial:** Ao clicar em "Início", a tela limpa e exibe uma contagem regressiva centralizada ($3, 2, 1$) antes de liberar a primeira questão e iniciar o cronômetro.
+* **Contagem Regressiva Inicial:** Ao clicar em "Início", a tela limpa e exibe uma contagem regressiva centralizada ($3, 2, 1$) antes de liberar a primeira questão e iniciar o cronômetro. Cada número da contagem emite um *beep* curto e, no momento em que a partida começa, toca um **som diferente** (mais agudo e mais longo).
 * **Duração:** A partida dura exatamente $100$ segundos.
 * **Barra de Progresso:** Uma barra superior verde diminui proporcionalmente ao tempo restante, acompanhada do texto `Tempo: X`.
 * **Alerta Sonoro:** Quando faltarem $10$ segundos, o sistema deve emitir **um único** sinal sonoro (*beep*) indicando que o tempo está acabando.
@@ -40,7 +40,7 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
   * O jogador digita os números no teclado e pressiona a tecla `Enter` (ou clica no botão "Respondida") para submeter.
   * **Acerto:** Soma $+1$ ao resultado atual, limpa o campo de texto imediatamente e gera a próxima questão.
   * **Erro (1ª tentativa):** A caixa de texto recebe uma **borda vermelha**, o campo é limpo e o jogador pode tentar **mais uma vez** a mesma questão.
-  * **Erro (2ª tentativa):** A caixa de texto desaparece e a **resposta correta é exibida cobrindo toda a tela por $1$ segundo**; em seguida uma nova questão é gerada (sem pontuar). O cronômetro **continua correndo** durante esse segundo.
+  * **Erro (2ª tentativa):** A caixa de texto desaparece e a **resposta correta é exibida cobrindo toda a tela por $1$ segundo**; em seguida uma nova questão é gerada (sem pontuar). O cronômetro **continua correndo** durante esse segundo, ou seja, o jogador **perde esse segundo** de propósito.
   * **Contador de erros:** Cada resposta errada submetida soma $+1$ ao contador `wrongAnswers` da partida (uma questão pode gerar até $2$ erros). Submissões vazias são ignoradas e não contam como erro.
   * **Fim da partida:** Após os $100$ segundos é exibida uma tela de resultado com a quantidade de acertos, estrelas e **quantidade de respostas erradas**.
 
