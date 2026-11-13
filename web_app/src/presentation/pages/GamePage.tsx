@@ -2,7 +2,7 @@ import { Anchor, Button, Center, Group, Stack, Text, TextInput } from '@mantine/
 import { Suspense, useEffect, useRef, useState, type FormEvent } from 'react'
 import { useGame } from '../../application/game/useGame'
 import type { FinishedMatch } from '../../application/ports/ScoreGateway'
-import { GameMode, isStateQuestion, type Question, type StateGameMode } from '../../domain'
+import { GameMode, isRulerQuestion, isTextQuestion, type Question, type StateGameMode, type TextQuestion } from '../../domain'
 import { LazyBrazilMap, preloadBrazilMap } from '../components/brazilMapLoader'
 import { preloadFlags } from '../components/flagImages'
 import { GameBoard } from '../components/GameBoard'
@@ -11,6 +11,7 @@ import { StateFlag } from '../components/StateFlag'
 import { StarBar } from '../components/StarBar'
 import { TimerBar } from '../components/TimerBar'
 import { messages } from '../i18n/messages'
+import { rulerHeading, rulerPrompt } from '../i18n/rulerPrompt'
 import classes from './GamePage.module.css'
 
 interface AnswerInputConfig {
@@ -49,6 +50,14 @@ function answerInputFor(mode: GameMode): AnswerInputConfig {
         className: classes.textAnswer,
         inputMode: 'text',
         placeholder: messages.game.demonymAnswerPlaceholder,
+        autoCapitalize: 'off',
+        sanitize: (value) => value,
+      }
+    case GameMode.BRAZIL_RULERS:
+      return {
+        className: classes.textAnswer,
+        inputMode: 'text',
+        placeholder: messages.game.rulerAnswerPlaceholder,
         autoCapitalize: 'off',
         sanitize: (value) => value,
       }
@@ -168,7 +177,7 @@ export function GamePage({ mode, personalBest, onFinished }: GamePageProps) {
   )
 }
 
-/** Question shown above the prompt text in the state games that display text (every one but flags). */
+/** Question shown above the prompt in each state game. */
 const TEXT_PROMPT_QUESTIONS: Record<StateGameMode, string> = {
   [GameMode.STATE_FLAGS]: messages.game.flagQuestion,
   [GameMode.STATE_ABBREVIATIONS]: messages.game.abbreviationQuestion,
@@ -187,8 +196,14 @@ function BrazilMapView({ stateCode, size }: { stateCode: string; size?: 'md' | '
   )
 }
 
+/** Heading and text shown in the games that ask with text (every one but flags and map). */
+function textPromptOf(question: TextQuestion): { heading: string; prompt: string } {
+  if (isRulerQuestion(question)) return { heading: rulerHeading(question.ruler), prompt: rulerPrompt(question.ruler) }
+  return { heading: TEXT_PROMPT_QUESTIONS[question.mode], prompt: question.prompt }
+}
+
 function QuestionPrompt({ question }: { question: Question }) {
-  if (isStateQuestion(question)) {
+  if (isTextQuestion(question)) {
     if (question.mode === GameMode.STATE_MAP) {
       return (
         <Stack align="center" gap="xs" data-testid="question">
@@ -210,10 +225,11 @@ function QuestionPrompt({ question }: { question: Question }) {
         </Stack>
       )
     }
+    const { heading, prompt } = textPromptOf(question)
     return (
       <Stack align="center" gap="sm" data-testid="question">
-        <Text c="white" fw={600} size="lg" ta="center">{TEXT_PROMPT_QUESTIONS[question.mode]}</Text>
-        <Text className={classes.promptText} c="white" data-testid="prompt">{question.prompt}</Text>
+        <Text c="white" fw={600} size="lg" ta="center">{heading}</Text>
+        <Text className={classes.promptText} c="white" data-testid="prompt">{prompt}</Text>
       </Stack>
     )
   }
@@ -225,7 +241,7 @@ function QuestionPrompt({ question }: { question: Question }) {
 }
 
 function RevealedAnswer({ question }: { question: Question }) {
-  if (isStateQuestion(question)) {
+  if (isTextQuestion(question)) {
     if (question.mode === GameMode.STATE_MAP) {
       return (
         <Stack align="center" gap="md">
@@ -244,7 +260,7 @@ function RevealedAnswer({ question }: { question: Question }) {
     }
     return (
       <Stack align="center" gap={0}>
-        <Text className={classes.revealName}>{question.prompt}</Text>
+        <Text className={classes.revealName}>{textPromptOf(question).prompt}</Text>
         {/* Names can be long ("Florianópolis"), so they use a smaller size than the two-letter abbreviation */}
         <Text className={question.mode === GameMode.STATE_ABBREVIATIONS ? classes.revealExpression : classes.revealLongAnswer}
           data-testid="revealed-answer">{question.answer}</Text>

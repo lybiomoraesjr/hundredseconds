@@ -22,14 +22,16 @@ Jogo web de perguntas rápidas: quantas perguntas você consegue responder em 10
 | Geografia do Brasil | Capitais | Minas Gerais | Belo Horizonte |
 | Geografia do Brasil | Gentílicos (estados) | Bahia | baiano |
 | Geografia do Brasil | Gentílicos (capitais) | Salvador | soteropolitano |
+| História do Brasil | Governantes | 1930 a 1945 | Getúlio Vargas |
 
 ## Como funciona
 
 - Uma contagem regressiva (3, 2, 1) com sinal sonoro, depois **100 segundos** para responder o máximo possível. A resposta é enviada com `Enter`.
 - Cada acerto vale 1 ponto, e **a cada 10 acertos você ganha uma estrela** (com um "plim"), até 10 estrelas. Um beep avisa quando faltam 10 segundos.
-- **Duas tentativas por pergunta (todos os jogos):** no primeiro erro a caixa fica vermelha e você tenta de novo; no segundo, a resposta certa aparece (por 1 segundo na matemática e 1,5 segundo na geografia) e o tempo continua correndo.
+- **Duas tentativas por pergunta (todos os jogos):** no primeiro erro a caixa fica vermelha e você tenta de novo; no segundo, a resposta certa aparece (por 1 segundo na matemática e 1,5 segundo na geografia e na história) e o tempo continua correndo.
 - **Matemática:** a dificuldade sobe conforme você acerta.
 - **Geografia:** os 27 estados (26 + DF) aparecem sem repetir até todos saírem. Acentos, maiúsculas e espaços extras são ignorados ("sao paulo" vale "São Paulo"), e nos gentílicos também valem o feminino, a forma sem hífen e as formas alternativas oficiais.
+- **História:** quem governou o Brasil em cada período, de Dom Pedro I até hoje (regências, juntas provisórias e presidentes), além dos presidentes eleitos que não tomaram posse. Nomes curtos e apelidos também valem ("Vargas", "JK", "Jango", "FHC", "Pedro 2").
 - Sem conta, o recorde fica salvo no navegador e você pode publicar o resultado no ranking com um nome. Com conta, os resultados vão para o servidor. Há rankings separados por jogo, do dia, da semana e do ano.
 
 ## Telas
@@ -95,7 +97,7 @@ Health check: `GET /actuator/health/liveness` (não consulta o banco) e `/actuat
 | :--- | :--- |
 | `cd api && ./mvnw test` | JUnit 5 + Mockito (domínio e casos de uso) e integração com PostgreSQL via Testcontainers (requer Docker) |
 | `cd web_app && npm test` | Vitest + Testing Library (domínio do jogo, componentes e integração com a API simulada) |
-| `cd web_app && npm run test:e2e` | Playwright de ponta a ponta (desktop e celular) contra a stack do Docker em `http://localhost:8088`, incluindo uma partida de cada jogo de geografia salva no servidor |
+| `cd web_app && npm run test:e2e` | Playwright de ponta a ponta (desktop e celular) contra a stack do Docker em `http://localhost:8088`, incluindo uma partida de cada jogo de geografia e história salva no servidor |
 
 Na primeira vez, instale o navegador do Playwright com `npx playwright install chromium`.
 Para rodar o E2E contra o servidor de desenvolvimento: `E2E_BASE_URL=http://localhost:5173 npm run test:e2e`.

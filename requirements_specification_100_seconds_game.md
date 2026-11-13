@@ -24,7 +24,7 @@ O objetivo deste projeto é desenvolver uma aplicação web de perguntas e respo
 ## 2. Regras de Negócio e Mecânicas de Jogo (Game Design)
 
 ### 2.1. Modalidades de Jogo
-Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma entre oito modalidades, exibidas como *chips* agrupados em **Matemática** e **Geografia do Brasil** (os chips quebram linha em telas pequenas):
+Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma entre nove modalidades, exibidas como *chips* agrupados em **Matemática**, **Geografia do Brasil** e **História do Brasil** (os chips quebram linha em telas pequenas):
 1. **Apenas Potenciação:** Questões no formato $a^n = ?$
 2. **Apenas Radiciação:** Questões no formato $\sqrt[n]{a} = ?$
 3. **Bandeiras dos estados** (`STATE_FLAGS`): aparece a bandeira de um estado brasileiro (26 estados + DF) e o jogador digita o nome do estado. Regras próprias:
@@ -42,6 +42,12 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
    * Gentílicos do estado não valem quando diferem do da capital (Salvador ≠ "baiano", São Paulo ≠ "paulista"). Apelidos informais (manezinho, papa-jerimum) e "capixaba" para Vitória também não.
 7. **Estados no mapa** (`STATE_MAP`, rótulo "Estados"): aparece o mapa do Brasil com um estado destacado e o jogador digita o nome do estado. Mesmas regras das Bandeiras. Estados pequenos demais para ver (DF, SE, AL) ganham um círculo em volta. O mapa vem de `@svg-maps/brazil` (Victor Cazanave, baseado no MapSVG, licença **CC BY 4.0**); o crédito aparece abaixo do mapa, como a licença exige. Os dados ficam em `brazilMapData.ts`, gerado por `web_app/scripts/generate_brazil_map.py`, e só são baixados por quem joga esse modo.
 8. **Gentílicos dos estados** (`STATE_DEMONYMS`, rótulo "Gentílicos (estados)"): aparece o nome de um estado e o jogador digita o gentílico (ex.: Bahia → baiano). Mesmas tolerâncias dos Gentílicos das capitais (hífens/espaços, feminino, formas alternativas oficiais: acriano/acreano, capixaba/espírito-santense, sul-mato-grossense/mato-grossense-do-sul, potiguar/norte-rio-grandense/rio-grandense-do-norte, gaúcho/sul-rio-grandense/rio-grandense-do-sul, rondoniense/rondoniano, catarinense/barriga-verde, sergipano/sergipense). O gentílico da capital não vale quando difere do estado (São Paulo ≠ "paulistano", Rio de Janeiro ≠ "carioca"). Para o Distrito Federal, "brasiliense".
+9. **Governantes do Brasil** (`BRAZIL_RULERS`, rótulo "Governantes", grupo História do Brasil): aparece um período e o jogador digita quem governou o Brasil nele (ex.: "1930 a 1945" → Getúlio Vargas). Regras próprias:
+   * Cobre todos os governantes desde a independência: Dom Pedro I, as quatro regências (Trina Provisória, Trina Permanente, Feijó e Araújo Lima), Dom Pedro II, todos os presidentes (inclusive interinos como Carlos Luz, Nereu Ramos e Ranieri Mazzilli) e as duas Juntas Governativas Provisórias (1930 e 1969). Quem governou duas vezes (Vargas, Mazzilli, Lula) aparece uma vez por mandato.
+   * Presidentes eleitos que **não tomaram posse** (Rodrigues Alves em 1918, Júlio Prestes em 1930 e Tancredo Neves em 1985) aparecem com outra pergunta: "Quem foi eleito presidente neste ano, mas não tomou posse?", seguida do ano da eleição.
+   * O período mostra só os anos ("1930 a 1945"); quando o mandato começou e terminou no mesmo ano, mostra as datas completas ("08/11/1955 a 11/11/1955"), para não confundir governantes do mesmo ano. O mandato atual aparece como "2023 até hoje".
+   * Mesma comparação dos outros jogos de texto (acentos, maiúsculas, espaços e hífens ignorados). Além do nome principal, valem nomes curtos e apelidos (Vargas/Getúlio, JK, Jango, FHC, Dutra, Médici...), e os imperadores em várias formas ("D. Pedro II", "Pedro 2", "Dom Pedro Segundo"). As juntas valem também como "Junta", "Junta Militar" ou "Junta Provisória". Ao errar, aparece o período e o nome principal.
+   * Demais regras iguais às Bandeiras: ordem aleatória sem repetir até todos aparecerem, duas tentativas e revelação de 1,5 s. Os dados ficam em `web_app/src/domain/entities/BrazilianRuler.ts`.
 
 *(Nota: Os rankings e recordes devem ser registrados e exibidos separadamente para cada modalidade).*
 
@@ -55,7 +61,7 @@ Antes de iniciar a partida, o usuário deverá escolher obrigatoriamente uma ent
   * O jogador digita os números no teclado e pressiona a tecla `Enter` (ou clica no botão "Respondida") para submeter.
   * **Acerto:** Soma $+1$ ao resultado atual, limpa o campo de texto imediatamente e gera a próxima questão.
   * **Erro (1ª tentativa):** A caixa de texto recebe uma **borda vermelha**, o campo é limpo e o jogador pode tentar **mais uma vez** a mesma questão.
-  * **Erro (2ª tentativa):** A caixa de texto desaparece e a **resposta correta é exibida cobrindo toda a tela por $1$ segundo** ($1{,}5$ s nos jogos de geografia); em seguida uma nova questão é gerada (sem pontuar). O cronômetro **continua correndo** durante esse segundo, ou seja, o jogador **perde esse segundo** de propósito.
+  * **Erro (2ª tentativa):** A caixa de texto desaparece e a **resposta correta é exibida cobrindo toda a tela por $1$ segundo** ($1{,}5$ s nos jogos de geografia e história); em seguida uma nova questão é gerada (sem pontuar). O cronômetro **continua correndo** durante esse segundo, ou seja, o jogador **perde esse segundo** de propósito.
   * **Contador de erros:** Cada resposta errada submetida soma $+1$ ao contador `wrongAnswers` da partida (uma questão pode gerar até $2$ erros). Submissões vazias são ignoradas e não contam como erro.
   * **Fim da partida:** Após os $100$ segundos é exibida uma tela de resultado com a quantidade de acertos, estrelas e **quantidade de respostas erradas**.
 

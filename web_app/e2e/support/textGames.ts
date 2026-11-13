@@ -1,14 +1,16 @@
 import { expect, type Page } from '@playwright/test'
+import { BRAZILIAN_RULERS } from '../../src/domain/entities/BrazilianRuler'
 import { BRAZILIAN_STATES, type BrazilianState } from '../../src/domain/entities/BrazilianState'
+import { rulerHeading, rulerPrompt } from '../../src/presentation/i18n/rulerPrompt'
 
-/** A geography game as the player sees it, and how to find the answer of the question on screen. */
-export interface GeographyGame {
+/** A game answered with text (geography and history) as the player sees it. */
+export interface TextGame {
   /** Chip label on the home page. */
   readonly label: string
-  readonly question: string
-  /** Finds the state behind the current question. */
-  readonly currentState: (page: Page) => Promise<BrazilianState>
-  readonly answerOf: (state: BrazilianState) => string
+  /** Question above the prompt; a pattern for rulers, who also ask about presidents who never took office. */
+  readonly question: RegExp | string
+  /** Finds the main answer of the question on screen. */
+  readonly currentAnswer: (page: Page) => Promise<string>
 }
 
 const byCode = (code: string | null) => {
@@ -27,7 +29,14 @@ const byPrompt = (field: 'name' | 'capital') => async (page: Page) => {
 const byImage = (name: string) => async (page: Page) =>
   byCode(await page.getByRole('img', { name }).getAttribute('data-state'))
 
-export const GEOGRAPHY_GAMES: readonly GeographyGame[] = [
+interface GeographyGame {
+  readonly label: string
+  readonly question: string
+  readonly currentState: (page: Page) => Promise<BrazilianState>
+  readonly answerOf: (state: BrazilianState) => string
+}
+
+const GEOGRAPHY_GAMES: readonly GeographyGame[] = [
   {
     label: 'Bandeiras',
     question: 'De qual estado é esta bandeira?',
@@ -66,20 +75,41 @@ export const GEOGRAPHY_GAMES: readonly GeographyGame[] = [
   },
 ]
 
-export async function answerGeographyCorrectly(page: Page, game: GeographyGame, times: number) {
+const currentRulerAnswer = async (page: Page) => {
+  const heading = await page.getByTestId('question').locator('p').first().textContent()
+  const prompt = await page.getByTestId('prompt').textContent()
+  const ruler = BRAZILIAN_RULERS.find((candidate) => rulerHeading(candidate) === heading && rulerPrompt(candidate) === prompt)
+  if (!ruler) throw new Error(`Unknown ruler question: ${heading} ${prompt}`)
+  return ruler.name
+}
+
+export const TEXT_GAMES: readonly TextGame[] = [
+  ...GEOGRAPHY_GAMES.map(({ label, question, currentState, answerOf }) => ({
+    label,
+    question,
+    currentAnswer: async (page: Page) => answerOf(await currentState(page)),
+  })),
+  {
+    label: 'Governantes',
+    question: /^Quem (governou o Brasil neste período|foi eleito presidente neste ano, mas não tomou posse)\?$/,
+    currentAnswer: currentRulerAnswer,
+  },
+]
+
+export async function answerCorrectly(page: Page, game: TextGame, times: number) {
   const input = page.getByLabel('Sua resposta')
   for (let i = 0; i < times; i++) {
-    await input.fill(game.answerOf(await game.currentState(page)))
+    await input.fill(await game.currentAnswer(page))
     await input.press('Enter')
     await expect(page.getByText(`Resultado: ${i + 1}`)).toBeVisible()
   }
 }
 
 /** Misses twice: after the second mistake the correct answer covers the screen for 1.5 s, then a new question shows up. */
-export async function missGeographyQuestion(page: Page, game: GeographyGame) {
-  const expected = game.answerOf(await game.currentState(page))
+export async function missQuestion(page: Page, game: TextGame) {
+  const expected = await game.currentAnswer(page)
   const input = page.getByLabel('Sua resposta')
-  // Digits are filtered out of abbreviations, so use letters that are never a state code
+  // Digits are filtered out of abbreviations, so use letters that are never a state code nor a ruler
   await input.fill('XX')
   await input.press('Enter')
   await expect(page.getByText('Errou! Tente mais uma vez.')).toBeVisible()

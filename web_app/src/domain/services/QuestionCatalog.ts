@@ -1,6 +1,7 @@
 import { DifficultyLevel } from '../entities/DifficultyLevel'
+import { BRAZILIAN_RULERS } from '../entities/BrazilianRuler'
 import { BRAZILIAN_STATES } from '../entities/BrazilianState'
-import { GameMode, type MathGameMode, type StateGameMode } from '../entities/GameMode'
+import { GameMode, type MathGameMode, type TextGameMode } from '../entities/GameMode'
 import {
   createAbbreviationQuestion,
   createCapitalQuestion,
@@ -10,7 +11,9 @@ import {
   createStateDemonymQuestion,
   createPowerQuestion,
   createRootQuestion,
+  createRulerQuestion,
   type MathQuestion,
+  type RulerQuestion,
   type StateQuestion,
 } from '../entities/Question'
 
@@ -82,16 +85,19 @@ export function questionsBelow(mode: MathGameMode, level: DifficultyLevel): read
   return LEVEL_ORDER.slice(0, LEVEL_ORDER.indexOf(level)).flatMap((lower) => CATALOG[mode][lower])
 }
 
-// One question per state (no difficulty levels)
-const STATE_QUESTIONS: Record<StateGameMode, readonly StateQuestion[]> = {
+// One question per state, or per ruler (no difficulty levels)
+type TextQuestionOf<M extends TextGameMode> = M extends typeof GameMode.BRAZIL_RULERS ? RulerQuestion : StateQuestion
+
+const TEXT_QUESTIONS: { readonly [M in TextGameMode]: readonly TextQuestionOf<M>[] } = {
   [GameMode.STATE_FLAGS]: BRAZILIAN_STATES.map(createFlagQuestion),
   [GameMode.STATE_ABBREVIATIONS]: BRAZILIAN_STATES.map(createAbbreviationQuestion),
   [GameMode.STATE_CAPITALS]: BRAZILIAN_STATES.map(createCapitalQuestion),
   [GameMode.CAPITAL_DEMONYMS]: BRAZILIAN_STATES.map(createCapitalDemonymQuestion),
   [GameMode.STATE_MAP]: BRAZILIAN_STATES.map(createMapQuestion),
   [GameMode.STATE_DEMONYMS]: BRAZILIAN_STATES.map(createStateDemonymQuestion),
+  [GameMode.BRAZIL_RULERS]: BRAZILIAN_RULERS.map(createRulerQuestion),
 }
 
-export function stateQuestionsFor(mode: StateGameMode): readonly StateQuestion[] {
-  return STATE_QUESTIONS[mode]
+export function textQuestionsFor<M extends TextGameMode>(mode: M): readonly TextQuestionOf<M>[] {
+  return TEXT_QUESTIONS[mode]
 }

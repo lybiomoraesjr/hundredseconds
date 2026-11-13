@@ -1,8 +1,9 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { BRAZILIAN_STATES, GameMode } from '../../domain'
+import { BRAZILIAN_RULERS, BRAZILIAN_STATES, GameMode } from '../../domain'
 import { advanceTime, answerFromLabel, createServices, renderWithProviders } from '../../test/renderWithProviders'
+import { rulerPrompt } from '../i18n/rulerPrompt'
 import { GamePage } from './GamePage'
 
 const advance = advanceTime
@@ -374,6 +375,35 @@ describe('GamePage', () => {
 
       expect(screen.getByRole('alert')).toHaveTextContent(state.name)
       expect(screen.getByTestId('revealed-answer')).toHaveTextContent(state.stateDemonyms[0])
+    })
+  })
+
+  describe('Brazilian rulers', () => {
+    const currentRuler = () =>
+      BRAZILIAN_RULERS.find((ruler) => rulerPrompt(ruler) === screen.getByTestId('prompt').textContent)!
+
+    it('shows a period and accepts who governed then', async () => {
+      const { user } = setup(GameMode.BRAZIL_RULERS)
+      await skipCountdown()
+      expect(screen.getByLabelText('Sua resposta')).toHaveAttribute('placeholder', 'Nome do governante')
+
+      await user.type(screen.getByLabelText('Sua resposta'), `${currentRuler().name}{Enter}`)
+
+      expect(screen.getByTestId('score')).toHaveTextContent('Resultado: 1')
+    })
+
+    it('reveals the period and the ruler after the second mistake, for 1.5 s', async () => {
+      const { user } = setup(GameMode.BRAZIL_RULERS)
+      await skipCountdown()
+      const ruler = currentRuler()
+
+      await user.type(screen.getByLabelText('Sua resposta'), 'Ninguém{Enter}')
+      await user.type(screen.getByLabelText('Sua resposta'), 'Ninguém{Enter}')
+
+      expect(screen.getByRole('alert')).toHaveTextContent(rulerPrompt(ruler))
+      expect(screen.getByTestId('revealed-answer')).toHaveTextContent(ruler.name)
+      await advance(1500)
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
   })
 })

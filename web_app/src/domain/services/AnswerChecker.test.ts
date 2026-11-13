@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { BRAZILIAN_RULERS } from '../entities/BrazilianRuler'
 import { BRAZILIAN_STATES } from '../entities/BrazilianState'
 import {
   createAbbreviationQuestion,
@@ -6,6 +7,7 @@ import {
   createCapitalDemonymQuestion,
   createFlagQuestion,
   createPowerQuestion,
+  createRulerQuestion,
   createStateDemonymQuestion,
 } from '../entities/Question'
 import { checkAnswer, normalizeText } from './AnswerChecker'
@@ -146,5 +148,48 @@ describe('checkAnswer with state demonyms', () => {
   it('rejects the capital demonym when it differs from the state one', () => {
     expect(checkAnswer(createStateDemonymQuestion(stateOf('sp')), 'paulistano')).toBe('WRONG')
     expect(checkAnswer(createStateDemonymQuestion(stateOf('rj')), 'carioca')).toBe('WRONG')
+  })
+})
+
+describe('checkAnswer with Brazilian rulers', () => {
+  const rulerQuestion = (id: string) => createRulerQuestion(BRAZILIAN_RULERS.find((ruler) => ruler.id === id)!)
+
+  it('accepts the full name and the usual short names, ignoring accents and case', () => {
+    const vargas = rulerQuestion('vargas-1')
+    expect(checkAnswer(vargas, 'Getúlio Vargas')).toBe('CORRECT')
+    expect(checkAnswer(vargas, 'getulio')).toBe('CORRECT')
+    expect(checkAnswer(vargas, 'VARGAS')).toBe('CORRECT')
+    expect(checkAnswer(rulerQuestion('fhc'), 'fhc')).toBe('CORRECT')
+    expect(checkAnswer(rulerQuestion('jango'), 'Jango')).toBe('CORRECT')
+    expect(checkAnswer(rulerQuestion('jk'), 'JK')).toBe('CORRECT')
+  })
+
+  it('accepts the emperors written in several ways, but tells them apart', () => {
+    const pedro1 = rulerQuestion('pedro-1')
+    const pedro2 = rulerQuestion('pedro-2')
+    for (const typed of ['Dom Pedro I', 'D. Pedro I', 'pedro 1', 'Dom Pedro Primeiro']) {
+      expect(checkAnswer(pedro1, typed), typed).toBe('CORRECT')
+    }
+    for (const typed of ['Dom Pedro II', 'D. Pedro II', 'pedro 2', 'dom pedro segundo']) {
+      expect(checkAnswer(pedro2, typed), typed).toBe('CORRECT')
+    }
+    expect(checkAnswer(pedro1, 'Dom Pedro II')).toBe('WRONG')
+    expect(checkAnswer(pedro2, 'Dom Pedro I')).toBe('WRONG')
+  })
+
+  it('tells the two triple regencies apart', () => {
+    const provisional = rulerQuestion('regency-provisional')
+    expect(checkAnswer(provisional, 'regencia trina provisoria')).toBe('CORRECT')
+    expect(checkAnswer(provisional, 'Regência Trina Permanente')).toBe('WRONG')
+  })
+
+  it('accepts the juntas by their short names', () => {
+    expect(checkAnswer(rulerQuestion('junta-1969'), 'junta militar')).toBe('CORRECT')
+    expect(checkAnswer(rulerQuestion('junta-1930'), 'Junta Governativa Provisória')).toBe('CORRECT')
+  })
+
+  it('rejects whoever governed in another period', () => {
+    expect(checkAnswer(rulerQuestion('dutra'), 'Getúlio Vargas')).toBe('WRONG')
+    expect(checkAnswer(rulerQuestion('tancredo'), 'Sarney')).toBe('WRONG')
   })
 })

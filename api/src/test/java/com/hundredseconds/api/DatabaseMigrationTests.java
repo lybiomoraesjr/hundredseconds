@@ -101,6 +101,15 @@ class DatabaseMigrationTests {
 	}
 
 	@Test
+	void shouldAcceptBrazilRulersGameMode() {
+		int inserted = jdbcTemplate.update(
+				"INSERT INTO game_scores (player_name, game_mode, score, stars_earned) VALUES (?, ?, ?, ?)",
+				"guest", "BRAZIL_RULERS", 15, 1);
+
+		assertThat(inserted).isEqualTo(1);
+	}
+
+	@Test
 	void shouldRejectUnknownGameMode() {
 		assertThatThrownBy(() -> jdbcTemplate.update(
 				"INSERT INTO game_scores (player_name, game_mode, score, stars_earned) VALUES (?, ?, ?, ?)",

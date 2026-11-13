@@ -17,5 +17,7 @@ public enum GameMode {
 	/** Name the Brazilian state highlighted on the map. */
 	STATE_MAP,
 	/** Type the demonym of a Brazilian state. */
-	STATE_DEMONYMS
+	STATE_DEMONYMS,
+	/** Type who governed Brazil in a given period (emperors, regencies, presidents, juntas). */
+	BRAZIL_RULERS
 }

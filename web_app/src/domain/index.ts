@@ -1,3 +1,4 @@
+export * from './entities/BrazilianRuler'
 export * from './entities/BrazilianState'
 export * from './entities/DifficultyLevel'
 export * from './entities/GameMode'

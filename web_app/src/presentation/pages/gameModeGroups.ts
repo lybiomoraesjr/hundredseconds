@@ -15,4 +15,5 @@ export const GAME_MODE_GROUPS: ReadonlyArray<{ readonly label: string; readonly 
       GameMode.CAPITAL_DEMONYMS,
     ],
   },
+  { label: messages.modeGroups.history, modes: [GameMode.BRAZIL_RULERS] },
 ]

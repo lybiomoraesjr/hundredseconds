@@ -13,11 +13,13 @@ export const messages = {
     [GameMode.CAPITAL_DEMONYMS]: 'Gentílicos (capitais)',
     [GameMode.STATE_MAP]: 'Estados',
     [GameMode.STATE_DEMONYMS]: 'Gentílicos (estados)',
+    [GameMode.BRAZIL_RULERS]: 'Governantes',
   },
   modeSelectorLabel: 'Modalidade',
   modeGroups: {
     math: 'Matemática',
     geography: 'Geografia do Brasil',
+    history: 'História do Brasil',
   },
   summary: {
     personalBest: 'O seu resultado mais alto:',
@@ -50,6 +52,9 @@ export const messages = {
     // Must not reveal the answer
     mapAlt: 'Mapa do Brasil com um estado destacado',
     mapCredit: 'Mapa: MapSVG / Victor Cazanave (CC BY 4.0)',
+    rulerQuestion: 'Quem governou o Brasil neste período?',
+    notInauguratedQuestion: 'Quem foi eleito presidente neste ano, mas não tomou posse?',
+    rulerAnswerPlaceholder: 'Nome do governante',
     starsLabel: (stars: number) => `${stars} de 10 estrelas`,
   },
   result: {
@@ -87,6 +92,10 @@ export const messages = {
       const names: Record<number, string> = { 2: 'raiz quadrada', 3: 'raiz cúbica', 4: 'raiz quarta', 5: 'raiz quinta' }
       return `${names[index] ?? `raiz de índice ${index}`} de ${radicand}`
     },
+  },
+  history: {
+    period: (from: string, to: string) => `${from} a ${to}`,
+    sinceUntilToday: (from: string) => `${from} até hoje`,
   },
   guestName: 'Você',
   auth: {
