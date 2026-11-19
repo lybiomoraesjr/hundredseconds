@@ -5,7 +5,7 @@ import {
   remainingSeconds,
   startSession,
   submitAnswer,
-  type GameMode,
+  type TimedGameMode,
   type GameSession,
   type QuestionGenerator,
   type SubmitOutcome,
@@ -35,7 +35,7 @@ export type GameAction =
   | { type: 'FINISH_REVEAL' }
   | { type: 'CLEAR_FEEDBACK' }
 
-export function createInitialGameState(mode: GameMode, generator: QuestionGenerator): GameState {
+export function createInitialGameState(mode: TimedGameMode, generator: QuestionGenerator): GameState {
   return {
     status: 'COUNTDOWN',
     countdown: GameRules.COUNTDOWN_FROM,

@@ -17,10 +17,10 @@ public interface GameScoreRepository {
 
 	Optional<Integer> findBestScoreByUser(UUID userId, GameMode gameMode);
 
-	/** Highest scores in the range, ordered by score desc then playedAt asc. */
+	/** Highest scores in the range, ordered by score desc, then shortest duration (time trials), then playedAt asc. */
 	List<LeaderboardEntry> findTopScores(GameMode gameMode, TimeRange range, int limit);
 
-	/** Highest scores of the user, ordered by score desc then playedAt asc. */
+	/** Highest scores of the user, in the same order as {@link #findTopScores}. */
 	List<LeaderboardEntry> findTopScoresByUser(UUID userId, GameMode gameMode, int limit);
 
 }

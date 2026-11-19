@@ -42,6 +42,10 @@ public class GameScoreJpaEntity {
 	@Column(name = "wrong_answers", nullable = false)
 	private int wrongAnswers;
 
+	/** Null for the 100 second games. */
+	@Column(name = "duration_ms")
+	private Integer durationMs;
+
 	@Column(name = "played_at", nullable = false)
 	private Instant playedAt;
 
@@ -50,7 +54,7 @@ public class GameScoreJpaEntity {
 	}
 
 	public GameScoreJpaEntity(Long id, UUID userId, String playerName, GameMode gameMode, int score, int starsEarned,
-			int wrongAnswers, Instant playedAt) {
+			int wrongAnswers, Integer durationMs, Instant playedAt) {
 		this.id = id;
 		this.userId = userId;
 		this.playerName = playerName;
@@ -58,6 +62,7 @@ public class GameScoreJpaEntity {
 		this.score = score;
 		this.starsEarned = starsEarned;
 		this.wrongAnswers = wrongAnswers;
+		this.durationMs = durationMs;
 		this.playedAt = playedAt;
 	}
 
@@ -87,6 +92,10 @@ public class GameScoreJpaEntity {
 
 	public int getWrongAnswers() {
 		return wrongAnswers;
+	}
+
+	public Integer getDurationMs() {
+		return durationMs;
 	}
 
 	public Instant getPlayedAt() {

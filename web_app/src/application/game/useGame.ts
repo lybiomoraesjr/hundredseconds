@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
-import { revealDurationFor, shouldPlayWarning, starsFor, type GameMode } from '../../domain'
+import { revealDurationFor, shouldPlayWarning, starsFor, type TimedGameMode } from '../../domain'
 import { useAppServices } from '../AppServices'
 import type { FinishedMatch } from '../ports/ScoreGateway'
 import { createGameReducer, createInitialGameState } from './gameReducer'
@@ -10,7 +10,7 @@ const COUNTDOWN_STEP_MS = 1000
 /**
  * Runs a match: countdown (with sounds), 100 second timer, answer reveal delay, warning beep and end of game.
  */
-export function useGame(mode: GameMode, onFinished: (match: FinishedMatch) => void) {
+export function useGame(mode: TimedGameMode, onFinished: (match: FinishedMatch) => void) {
   const { questionGenerator, beeper, now } = useAppServices()
   const reducer = useMemo(() => createGameReducer(questionGenerator), [questionGenerator])
   const [state, dispatch] = useReducer(reducer, undefined, () => createInitialGameState(mode, questionGenerator))

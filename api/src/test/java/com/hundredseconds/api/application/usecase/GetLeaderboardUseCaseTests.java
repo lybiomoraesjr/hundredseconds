@@ -49,24 +49,24 @@ class GetLeaderboardUseCaseTests {
 	@EnumSource(value = LeaderboardPeriod.class, names = { "DAY", "WEEK", "YEAR" })
 	void shouldRankGlobalEntriesForTimeBasedPeriods(LeaderboardPeriod period) {
 		when(gameScoreRepository.findTopScores(GameMode.EXPONENTIATION, resolver.resolve(period), 10))
-			.thenReturn(List.of(new LeaderboardEntry("Ana", 118, PLAYED_AT), new LeaderboardEntry("Bia", 90, PLAYED_AT)));
+			.thenReturn(List.of(new LeaderboardEntry("Ana", 118, null, PLAYED_AT), new LeaderboardEntry("Bia", 90, null, PLAYED_AT)));
 
 		List<LeaderboardEntryResult> result = useCase.execute(GameMode.EXPONENTIATION, period, null);
 
-		assertThat(result).containsExactly(new LeaderboardEntryResult(1, "Ana", 118, PLAYED_AT),
-				new LeaderboardEntryResult(2, "Bia", 90, PLAYED_AT));
+		assertThat(result).containsExactly(new LeaderboardEntryResult(1, "Ana", 118, null, PLAYED_AT),
+				new LeaderboardEntryResult(2, "Bia", 90, null, PLAYED_AT));
 	}
 
 	@Test
 	void shouldReturnOwnResultsForUserPeriod() {
 		UUID userId = UUID.randomUUID();
 		when(gameScoreRepository.findTopScoresByUser(userId, GameMode.ROOT_EXTRACTION, 10))
-			.thenReturn(List.of(new LeaderboardEntry("Ana", 50, PLAYED_AT)));
+			.thenReturn(List.of(new LeaderboardEntry("Ana", 50, null, PLAYED_AT)));
 
 		List<LeaderboardEntryResult> result = useCase.execute(GameMode.ROOT_EXTRACTION, LeaderboardPeriod.USER,
 				userId);
 
-		assertThat(result).containsExactly(new LeaderboardEntryResult(1, "Ana", 50, PLAYED_AT));
+		assertThat(result).containsExactly(new LeaderboardEntryResult(1, "Ana", 50, null, PLAYED_AT));
 	}
 
 	@Test

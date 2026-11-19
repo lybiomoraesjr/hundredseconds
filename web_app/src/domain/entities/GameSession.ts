@@ -1,4 +1,4 @@
-import type { GameMode } from './GameMode'
+import type { TimedGameMode } from './GameMode'
 import { GameRules } from './GameRules'
 import type { Question } from './Question'
 import { checkAnswer } from '../services/AnswerChecker'
@@ -12,7 +12,7 @@ import { starsFor } from '../services/StarCalculator'
 export type SessionPhase = 'ANSWERING' | 'REVEALING_ANSWER'
 
 export interface GameSession {
-  readonly mode: GameMode
+  readonly mode: TimedGameMode
   readonly score: number
   readonly wrongAnswers: number
   readonly currentQuestion: Question
@@ -37,7 +37,7 @@ export interface SubmitResult {
   readonly outcome: SubmitOutcome
 }
 
-export function startSession(mode: GameMode, generator: QuestionGenerator): GameSession {
+export function startSession(mode: TimedGameMode, generator: QuestionGenerator): GameSession {
   const firstQuestion = generator.next(mode, 0)
   return {
     mode,

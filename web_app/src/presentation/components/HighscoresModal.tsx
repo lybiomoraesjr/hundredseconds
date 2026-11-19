@@ -2,7 +2,7 @@ import { Button, Center, Group, Loader, Modal, Paper, Table, Tabs, Text, Title }
 import { useEffect, useState } from 'react'
 import { useAppServices } from '../../application/AppServices'
 import type { LeaderboardEntry } from '../../application/ports/ScoreGateway'
-import { LeaderboardPeriod, type GameMode } from '../../domain'
+import { isRulersMode, LeaderboardPeriod, type GameMode } from '../../domain'
 import { messages } from '../i18n/messages'
 
 const PERIODS = [LeaderboardPeriod.USER, LeaderboardPeriod.DAY, LeaderboardPeriod.WEEK, LeaderboardPeriod.YEAR]
@@ -18,6 +18,7 @@ export function HighscoresModal({ mode, onClose }: HighscoresModalProps) {
   const [period, setPeriod] = useState<LeaderboardPeriod>(LeaderboardPeriod.USER)
   const [loaded, setLoaded] = useState<{ key: string; entries: LeaderboardEntry[] | 'ERROR' } | null>(null)
 
+  const showTime = isRulersMode(mode)
   const requestKey = `${mode}:${period}`
   // While the selected tab has not loaded yet, show the loader
   const entries = loaded?.key === requestKey ? loaded.entries : null
@@ -34,7 +35,7 @@ export function HighscoresModal({ mode, onClose }: HighscoresModalProps) {
 
   return (
     <Modal opened onClose={onClose} size="lg" centered
-      title={<Text fw={700}>{messages.highscores} · {messages.modes[mode]}</Text>}
+      title={<Text fw={700}>{messages.highscores} · {messages.modeTitle(mode)}</Text>}
       closeButtonProps={{ 'aria-label': messages.leaderboard.close }}>
       <Tabs value={period} onChange={(value) => value && setPeriod(value as LeaderboardPeriod)}>
         <Tabs.List mb="md">
@@ -57,6 +58,7 @@ export function HighscoresModal({ mode, onClose }: HighscoresModalProps) {
                 <Table.Th w={50} />
                 <Table.Th>{messages.leaderboard.name}</Table.Th>
                 <Table.Th ta="right">{messages.leaderboard.score}</Table.Th>
+                {showTime && <Table.Th ta="right">{messages.leaderboard.time}</Table.Th>}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -65,6 +67,9 @@ export function HighscoresModal({ mode, onClose }: HighscoresModalProps) {
                   <Table.Td>{entry.rank}.</Table.Td>
                   <Table.Td>{entry.playerName}</Table.Td>
                   <Table.Td ta="right" fw={700}>{entry.score}</Table.Td>
+                  {showTime && (
+                    <Table.Td ta="right">{entry.durationMs == null ? '' : messages.formatDuration(entry.durationMs)}</Table.Td>
+                  )}
                 </Table.Tr>
               ))}
             </Table.Tbody>

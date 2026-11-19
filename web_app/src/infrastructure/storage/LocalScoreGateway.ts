@@ -47,12 +47,14 @@ export class LocalScoreGateway implements Omit<ScoreGateway, 'submitGuestScore'>
     const matches = this.matchesOf(mode)
     const inPeriod = period === LeaderboardPeriod.USER ? matches : this.since(matches, this.startOf(period))
     return [...inPeriod]
-      .sort((a, b) => b.score - a.score || a.playedAt.localeCompare(b.playedAt))
+      // Same order as the API: score, then the shortest time (time trials), then the earliest
+      .sort((a, b) => b.score - a.score || durationOf(a) - durationOf(b) || a.playedAt.localeCompare(b.playedAt))
       .slice(0, LEADERBOARD_SIZE)
       .map((match, index) => ({
         rank: index + 1,
         playerName: this.playerName,
         score: match.score,
+        durationMs: match.durationMs ?? null,
         playedAt: match.playedAt,
       }))
   }
@@ -100,6 +102,8 @@ export class LocalScoreGateway implements Omit<ScoreGateway, 'submitGuestScore'>
     }
   }
 }
+
+const durationOf = (match: StoredMatch) => match.durationMs ?? Number.MAX_SAFE_INTEGER
 
 function safeLocalStorage(): Storage | null {
   try {

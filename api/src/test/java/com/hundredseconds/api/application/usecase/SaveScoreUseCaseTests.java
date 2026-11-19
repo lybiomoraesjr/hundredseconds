@@ -54,7 +54,7 @@ class SaveScoreUseCaseTests {
 		when(gameScoreRepository.save(any())).thenAnswer(invocation -> {
 			GameScore s = invocation.getArgument(0);
 			return new GameScore(id, s.userId(), s.playerName(), s.gameMode(), s.score(), s.starsEarned(),
-					s.wrongAnswers(), s.playedAt());
+					s.wrongAnswers(), s.durationMs(), s.playedAt());
 		});
 	}
 
@@ -66,12 +66,12 @@ class SaveScoreUseCaseTests {
 		returnSavedScoreWithId(1L);
 
 		SavedScoreResult result = useCase
-			.execute(new SaveScoreCommand(userId, "Someone else", GameMode.EXPONENTIATION, 105, 7));
+			.execute(new SaveScoreCommand(userId, "Someone else", GameMode.EXPONENTIATION, 105, 7, null));
 
 		ArgumentCaptor<GameScore> captor = ArgumentCaptor.forClass(GameScore.class);
 		verify(gameScoreRepository).save(captor.capture());
 		assertThat(captor.getValue().userId()).isEqualTo(userId);
-		assertThat(result).isEqualTo(new SavedScoreResult(1L, "Ana", GameMode.EXPONENTIATION, 105, 10, 7, NOW));
+		assertThat(result).isEqualTo(new SavedScoreResult(1L, "Ana", GameMode.EXPONENTIATION, 105, 10, 7, null, NOW));
 	}
 
 	@Test
@@ -79,7 +79,7 @@ class SaveScoreUseCaseTests {
 		returnSavedScoreWithId(2L);
 
 		SavedScoreResult result = useCase
-			.execute(new SaveScoreCommand(null, " Visitante ", GameMode.ROOT_EXTRACTION, 23, 4));
+			.execute(new SaveScoreCommand(null, " Visitante ", GameMode.ROOT_EXTRACTION, 23, 4, null));
 
 		verifyNoInteractions(userRepository);
 		assertThat(result.playerName()).isEqualTo("Visitante");
@@ -89,7 +89,7 @@ class SaveScoreUseCaseTests {
 
 	@Test
 	void shouldRejectGuestWithoutName() {
-		assertThatThrownBy(() -> useCase.execute(new SaveScoreCommand(null, null, GameMode.EXPONENTIATION, 10, 0)))
+		assertThatThrownBy(() -> useCase.execute(new SaveScoreCommand(null, null, GameMode.EXPONENTIATION, 10, 0, null)))
 			.isInstanceOf(InvalidPlayerNameException.class);
 		verify(gameScoreRepository, never()).save(any());
 	}
@@ -99,15 +99,25 @@ class SaveScoreUseCaseTests {
 		UUID userId = UUID.randomUUID();
 		when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-		assertThatThrownBy(() -> useCase.execute(new SaveScoreCommand(userId, null, GameMode.EXPONENTIATION, 10, 0)))
+		assertThatThrownBy(() -> useCase.execute(new SaveScoreCommand(userId, null, GameMode.EXPONENTIATION, 10, 0, null)))
 			.isInstanceOf(UserNotFoundException.class);
 	}
 
 	@Test
 	void shouldRejectImplausibleScore() {
-		assertThatThrownBy(() -> useCase.execute(new SaveScoreCommand(null, "Bot", GameMode.EXPONENTIATION, 500, 0)))
+		assertThatThrownBy(() -> useCase.execute(new SaveScoreCommand(null, "Bot", GameMode.EXPONENTIATION, 500, 0, null)))
 			.isInstanceOf(ImplausibleScoreException.class);
 		verify(gameScoreRepository, never()).save(any());
+	}
+
+	@Test
+	void shouldSaveTheDurationOfTimeTrials() {
+		returnSavedScoreWithId(3L);
+
+		SavedScoreResult result = useCase
+			.execute(new SaveScoreCommand(null, "Visitante", GameMode.RULERS_EMPIRE, 5, 1, 42_000));
+
+		assertThat(result.durationMs()).isEqualTo(42_000);
 	}
 
 }

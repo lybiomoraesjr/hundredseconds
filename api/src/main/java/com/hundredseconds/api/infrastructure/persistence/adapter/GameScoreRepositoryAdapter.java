@@ -61,17 +61,18 @@ public class GameScoreRepositoryAdapter implements GameScoreRepository {
 
 	private static GameScoreJpaEntity toEntity(GameScore score) {
 		return new GameScoreJpaEntity(score.id(), score.userId(), score.playerName().value(), score.gameMode(),
-				score.score(), score.starsEarned(), score.wrongAnswers(), score.playedAt());
+				score.score(), score.starsEarned(), score.wrongAnswers(), score.durationMs(), score.playedAt());
 	}
 
 	private static GameScore toDomain(GameScoreJpaEntity entity) {
 		return new GameScore(entity.getId(), entity.getUserId(), new PlayerName(entity.getPlayerName()),
 				entity.getGameMode(), entity.getScore(), entity.getStarsEarned(), entity.getWrongAnswers(),
-				entity.getPlayedAt());
+				entity.getDurationMs(), entity.getPlayedAt());
 	}
 
 	private static LeaderboardEntry toEntry(GameScoreJpaEntity entity) {
-		return new LeaderboardEntry(entity.getPlayerName(), entity.getScore(), entity.getPlayedAt());
+		return new LeaderboardEntry(entity.getPlayerName(), entity.getScore(), entity.getDurationMs(),
+				entity.getPlayedAt());
 	}
 
 }

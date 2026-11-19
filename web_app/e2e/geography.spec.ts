@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
 import { finishMatch, openGame, register, startMatch, uniqueTag } from './support/game'
-import { answerCorrectly, missQuestion, TEXT_GAMES } from './support/textGames'
+import { answerGeographyCorrectly, GEOGRAPHY_GAMES, missGeographyQuestion } from './support/geography'
 
-test.describe('Text games (geography and history)', () => {
+test.describe('Geography games', () => {
   test.beforeEach(async ({ page }) => openGame(page))
 
-  for (const game of TEXT_GAMES) {
+  for (const game of GEOGRAPHY_GAMES) {
     test(`${game.label}: plays a match and saves the result on the server`, async ({ page }) => {
       const tag = uniqueTag()
       await register(page, `Geo${tag}`, `geo${tag}@mail.com`)
@@ -15,8 +15,8 @@ test.describe('Text games (geography and history)', () => {
       await startMatch(page)
       await expect(page.getByText(game.question)).toBeVisible()
 
-      await answerCorrectly(page, game, 3)
-      await missQuestion(page, game)
+      await answerGeographyCorrectly(page, game, 3)
+      await missGeographyQuestion(page, game)
       await finishMatch(page)
 
       await expect(page.getByTestId('result-score')).toContainText('3')

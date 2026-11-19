@@ -47,9 +47,10 @@ public class ScoreController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public SavedScoreResponse save(@Valid @RequestBody SaveScoreRequest request, @AuthenticationPrincipal Jwt jwt) {
 		SavedScoreResult result = saveScoreUseCase.execute(new SaveScoreCommand(CurrentUser.idOf(jwt),
-				request.playerName(), request.gameMode(), request.score(), request.wrongAnswers()));
+				request.playerName(), request.gameMode(), request.score(), request.wrongAnswers(),
+				request.durationMs()));
 		return new SavedScoreResponse(result.id(), result.playerName(), result.gameMode(), result.score(),
-				result.starsEarned(), result.wrongAnswers(), result.playedAt());
+				result.starsEarned(), result.wrongAnswers(), result.durationMs(), result.playedAt());
 	}
 
 	@GetMapping("/summary")
@@ -64,7 +65,7 @@ public class ScoreController {
 		return getLeaderboardUseCase.execute(mode, period, CurrentUser.idOf(jwt))
 			.stream()
 			.map(entry -> new LeaderboardEntryResponse(entry.rank(), entry.playerName(), entry.score(),
-					entry.playedAt()))
+					entry.durationMs(), entry.playedAt()))
 			.toList();
 	}
 

@@ -14,6 +14,8 @@ export interface AppServices {
   readonly questionGenerator: QuestionGenerator
   /** Current time in milliseconds, like Date.now. */
   readonly now: () => number
+  /** Number in [0, 1), like Math.random (shuffles the rulers quiz options). */
+  readonly random: () => number
 }
 
 const AppServicesContext = createContext<AppServices | null>(null)

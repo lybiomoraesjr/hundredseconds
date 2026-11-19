@@ -3,13 +3,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAppServices } from '../application/AppServices'
 import { useAuth } from '../application/auth/useAuth'
 import type { FinishedMatch, ScoreSummary } from '../application/ports/ScoreGateway'
-import { GameMode } from '../domain'
+import { GameMode, isRulersMode } from '../domain'
 import { AuthModal } from './components/AuthModal'
 import { HighscoresModal } from './components/HighscoresModal'
 import type { SaveState } from './components/SaveStatusPanel'
 import { GamePage } from './pages/GamePage'
 import { HomePage } from './pages/HomePage'
 import { ResultPage } from './pages/ResultPage'
+import { RulersQuizPage } from './pages/RulersQuizPage'
 
 type Screen =
   | { name: 'HOME' }
@@ -73,10 +74,12 @@ export function App() {
         <HomePage mode={mode} summary={summary} onModeChange={setMode} onStart={startGame}
           onOpenHighscores={() => setHighscoresOpened(true)} onOpenLogin={() => setLoginOpened(true)} />
       )}
-      {screen.name === 'GAME' && (
+      {screen.name === 'GAME' && (isRulersMode(mode) ? (
+        <RulersQuizPage key={screen.gameId} mode={mode} onFinished={handleFinished} />
+      ) : (
         <GamePage key={screen.gameId} mode={mode} personalBest={summary?.personalBest ?? null}
           onFinished={handleFinished} />
-      )}
+      ))}
       {screen.name === 'RESULT' && (
         <ResultPage match={screen.match} isNewRecord={screen.isNewRecord} saveState={saveState}
           isGuest={screen.isGuest} onSubmitGuestName={submitGuestName} onPlayAgain={startGame}

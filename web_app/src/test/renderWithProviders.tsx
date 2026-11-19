@@ -44,6 +44,7 @@ export function createServices(overrides: Partial<AppServices> = {}): AppService
     beeper: { unlock: vi.fn(), countdownTick: vi.fn(), start: vi.fn(), warning: vi.fn(), star: vi.fn() },
     questionGenerator: new QuestionGenerator(),
     now: () => Date.now(),
+    random: Math.random,
     ...overrides,
   }
 }

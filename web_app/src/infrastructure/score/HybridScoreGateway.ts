@@ -71,5 +71,6 @@ export class HybridScoreGateway implements ScoreGateway {
 }
 
 function toRequest(match: FinishedMatch) {
-  return { gameMode: match.mode, score: match.score, wrongAnswers: match.wrongAnswers }
+  const request = { gameMode: match.mode, score: match.score, wrongAnswers: match.wrongAnswers }
+  return match.durationMs === undefined ? request : { ...request, durationMs: match.durationMs }
 }

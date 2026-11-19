@@ -1,6 +1,5 @@
-import type { BrazilianRuler } from './BrazilianRuler'
 import type { BrazilianState } from './BrazilianState'
-import { GameMode, isTextMode, type MathGameMode, type StateGameMode } from './GameMode'
+import { GameMode, isStateMode, type MathGameMode, type StateGameMode } from './GameMode'
 
 /**
  * A single math question.
@@ -36,31 +35,10 @@ export interface StateQuestion {
   readonly acceptedAnswers: readonly string[]
 }
 
-/**
- * History: shows a period ("1930 a 1945") or an election year of someone who never took office,
- * the answer is who governed / was elected.
- */
-export interface RulerQuestion {
-  readonly id: string
-  readonly mode: typeof GameMode.BRAZIL_RULERS
-  readonly ruler: BrazilianRuler
-  /** Main answer, shown when the player misses. */
-  readonly answer: string
-  /** Every answer that counts as correct (includes the main one). */
-  readonly acceptedAnswers: readonly string[]
-}
+export type Question = MathQuestion | StateQuestion
 
-/** Any question answered with text. */
-export type TextQuestion = StateQuestion | RulerQuestion
-
-export type Question = MathQuestion | TextQuestion
-
-export function isTextQuestion(question: Question): question is TextQuestion {
-  return isTextMode(question.mode)
-}
-
-export function isRulerQuestion(question: Question): question is RulerQuestion {
-  return question.mode === GameMode.BRAZIL_RULERS
+export function isStateQuestion(question: Question): question is StateQuestion {
+  return isStateMode(question.mode)
 }
 
 export function createPowerQuestion(base: number, exponent: number): MathQuestion {
@@ -123,14 +101,4 @@ export function createStateDemonymQuestion(state: BrazilianState): StateQuestion
   const [main] = state.stateDemonyms
   return stateQuestion(GameMode.STATE_DEMONYMS, 'state-demonym', state, state.name, main,
     withFeminineForms(state.stateDemonyms))
-}
-
-export function createRulerQuestion(ruler: BrazilianRuler): RulerQuestion {
-  return {
-    id: `ruler:${ruler.id}`,
-    mode: GameMode.BRAZIL_RULERS,
-    ruler,
-    answer: ruler.name,
-    acceptedAnswers: [ruler.name, ...ruler.otherNames],
-  }
 }

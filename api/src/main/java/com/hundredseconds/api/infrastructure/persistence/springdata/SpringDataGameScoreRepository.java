@@ -30,7 +30,7 @@ public interface SpringDataGameScoreRepository extends JpaRepository<GameScoreJp
 	@Query("""
 			SELECT s FROM GameScoreJpaEntity s
 			WHERE s.gameMode = :gameMode AND s.playedAt >= :start AND s.playedAt < :end
-			ORDER BY s.score DESC, s.playedAt ASC
+			ORDER BY s.score DESC, s.durationMs ASC NULLS LAST, s.playedAt ASC
 			""")
 	List<GameScoreJpaEntity> findTopScores(@Param("gameMode") GameMode gameMode, @Param("start") Instant start,
 			@Param("end") Instant end, Pageable pageable);
@@ -38,7 +38,7 @@ public interface SpringDataGameScoreRepository extends JpaRepository<GameScoreJp
 	@Query("""
 			SELECT s FROM GameScoreJpaEntity s
 			WHERE s.userId = :userId AND s.gameMode = :gameMode
-			ORDER BY s.score DESC, s.playedAt ASC
+			ORDER BY s.score DESC, s.durationMs ASC NULLS LAST, s.playedAt ASC
 			""")
 	List<GameScoreJpaEntity> findTopScoresByUser(@Param("userId") UUID userId, @Param("gameMode") GameMode gameMode,
 			Pageable pageable);

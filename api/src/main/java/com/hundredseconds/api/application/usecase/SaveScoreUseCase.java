@@ -34,10 +34,10 @@ public class SaveScoreUseCase {
 				: new PlayerName(command.guestName());
 
 		GameScore saved = gameScoreRepository.save(GameScore.create(command.userId(), playerName, command.gameMode(),
-				command.score(), command.wrongAnswers(), clock.instant()));
+				command.score(), command.wrongAnswers(), command.durationMs(), clock.instant()));
 
 		return new SavedScoreResult(saved.id(), saved.playerName().value(), saved.gameMode(), saved.score(),
-				saved.starsEarned(), saved.wrongAnswers(), saved.playedAt());
+				saved.starsEarned(), saved.wrongAnswers(), saved.durationMs(), saved.playedAt());
 	}
 
 }

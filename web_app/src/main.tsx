@@ -34,6 +34,7 @@ const services: AppServices = {
   beeper: new WebAudioBeeper(),
   questionGenerator: new QuestionGenerator(),
   now: () => Date.now(),
+  random: Math.random,
 }
 
 createRoot(document.getElementById('root')!).render(

@@ -38,7 +38,8 @@ public class GetLeaderboardUseCase {
 
 		return IntStream.range(0, entries.size()).mapToObj(index -> {
 			LeaderboardEntry entry = entries.get(index);
-			return new LeaderboardEntryResult(index + 1, entry.playerName(), entry.score(), entry.playedAt());
+			return new LeaderboardEntryResult(index + 1, entry.playerName(), entry.score(), entry.durationMs(),
+					entry.playedAt());
 		}).toList();
 	}
 

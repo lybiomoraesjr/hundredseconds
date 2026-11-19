@@ -6,6 +6,7 @@ export interface SaveScoreRequest {
   readonly gameMode: GameMode
   readonly score: number
   readonly wrongAnswers: number
+  readonly durationMs?: number
   readonly playerName?: string
 }
 

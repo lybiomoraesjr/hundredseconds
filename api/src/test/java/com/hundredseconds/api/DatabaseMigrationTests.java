@@ -101,12 +101,30 @@ class DatabaseMigrationTests {
 	}
 
 	@Test
-	void shouldAcceptBrazilRulersGameMode() {
-		int inserted = jdbcTemplate.update(
-				"INSERT INTO game_scores (player_name, game_mode, score, stars_earned) VALUES (?, ?, ?, ?)",
-				"guest", "BRAZIL_RULERS", 15, 1);
+	void shouldAcceptRulersTimeTrialsWithDuration() {
+		for (String mode : new String[] { "RULERS_EMPIRE", "RULERS_OLD_REPUBLIC", "RULERS_VARGAS_ERA",
+				"RULERS_MILITARY", "RULERS_NEW_REPUBLIC", "RULERS_ALL" }) {
+			int inserted = jdbcTemplate.update(
+					"INSERT INTO game_scores (player_name, game_mode, score, stars_earned, duration_ms) VALUES (?, ?, ?, ?, ?)",
+					"guest", mode, 5, 0, 42_000);
+			assertThat(inserted).isEqualTo(1);
+		}
+	}
 
-		assertThat(inserted).isEqualTo(1);
+	@Test
+	void shouldRejectTheOldRulersGameMode() {
+		assertThatThrownBy(() -> jdbcTemplate.update(
+				"INSERT INTO game_scores (player_name, game_mode, score, stars_earned) VALUES (?, ?, ?, ?)",
+				"guest", "BRAZIL_RULERS", 15, 1))
+			.isInstanceOf(DataIntegrityViolationException.class);
+	}
+
+	@Test
+	void shouldRejectNonPositiveDurations() {
+		assertThatThrownBy(() -> jdbcTemplate.update(
+				"INSERT INTO game_scores (player_name, game_mode, score, stars_earned, duration_ms) VALUES (?, ?, ?, ?, ?)",
+				"guest", "RULERS_ALL", 5, 0, 0))
+			.isInstanceOf(DataIntegrityViolationException.class);
 	}
 
 	@Test

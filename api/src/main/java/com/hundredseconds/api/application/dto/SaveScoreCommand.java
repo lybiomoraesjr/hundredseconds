@@ -6,7 +6,9 @@ import com.hundredseconds.api.domain.model.GameMode;
 
 /**
  * @param userId    authenticated user, or null for guests
- * @param guestName name informed by a guest; ignored when userId is present
+ * @param guestName  name informed by a guest; ignored when userId is present
+ * @param durationMs how long a time trial took; null for the 100 second games
  */
-public record SaveScoreCommand(UUID userId, String guestName, GameMode gameMode, int score, int wrongAnswers) {
+public record SaveScoreCommand(UUID userId, String guestName, GameMode gameMode, int score, int wrongAnswers,
+		Integer durationMs) {
 }

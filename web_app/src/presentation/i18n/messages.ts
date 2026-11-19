@@ -1,25 +1,43 @@
-import { GameMode, LeaderboardPeriod } from '../../domain'
+import { GameMode, isRulersMode, LeaderboardPeriod } from '../../domain'
+
+const modes = {
+  [GameMode.EXPONENTIATION]: 'Potenciação',
+  [GameMode.ROOT_EXTRACTION]: 'Radiciação',
+  [GameMode.STATE_FLAGS]: 'Bandeiras',
+  [GameMode.STATE_ABBREVIATIONS]: 'Siglas',
+  [GameMode.STATE_CAPITALS]: 'Capitais',
+  [GameMode.CAPITAL_DEMONYMS]: 'Gentílicos (capitais)',
+  [GameMode.STATE_MAP]: 'Estados',
+  [GameMode.STATE_DEMONYMS]: 'Gentílicos (estados)',
+  [GameMode.RULERS_EMPIRE]: 'Império',
+  [GameMode.RULERS_OLD_REPUBLIC]: 'República Velha',
+  [GameMode.RULERS_VARGAS_ERA]: 'De Vargas a Jango',
+  [GameMode.RULERS_MILITARY]: 'Ditadura Militar',
+  [GameMode.RULERS_NEW_REPUBLIC]: 'Nova República',
+  [GameMode.RULERS_ALL]: 'Todos',
+} as const satisfies Record<GameMode, string>
+
+/** "0:42,3" (minutes, seconds and tenths). */
+function formatDuration(durationMs: number): string {
+  const tenths = Math.floor(durationMs / 100)
+  const minutes = Math.floor(tenths / 600)
+  const seconds = Math.floor((tenths % 600) / 10)
+  return `${minutes}:${String(seconds).padStart(2, '0')},${tenths % 10}`
+}
 
 /** User-facing texts (pt-BR). Kept apart from the code so naming stays in English. */
 export const messages = {
   appTitle: '100 segundos',
   appTagline: 'Quantas perguntas consegue responder dentro de 100 segundos? Faça o teste!',
-  modes: {
-    [GameMode.EXPONENTIATION]: 'Potenciação',
-    [GameMode.ROOT_EXTRACTION]: 'Radiciação',
-    [GameMode.STATE_FLAGS]: 'Bandeiras',
-    [GameMode.STATE_ABBREVIATIONS]: 'Siglas',
-    [GameMode.STATE_CAPITALS]: 'Capitais',
-    [GameMode.CAPITAL_DEMONYMS]: 'Gentílicos (capitais)',
-    [GameMode.STATE_MAP]: 'Estados',
-    [GameMode.STATE_DEMONYMS]: 'Gentílicos (estados)',
-    [GameMode.BRAZIL_RULERS]: 'Governantes',
-  },
+  /** Chip labels; the rulers eras only make sense under their group title. */
+  modes,
+  /** Full name of a game, shown on the result and on the highscores. */
+  modeTitle: (mode: GameMode) => (isRulersMode(mode) ? `Governantes: ${modes[mode]}` : modes[mode]),
   modeSelectorLabel: 'Modalidade',
   modeGroups: {
     math: 'Matemática',
     geography: 'Geografia do Brasil',
-    history: 'História do Brasil',
+    history: 'Governantes do Brasil',
   },
   summary: {
     personalBest: 'O seu resultado mais alto:',
@@ -54,11 +72,14 @@ export const messages = {
     mapCredit: 'Mapa: MapSVG / Victor Cazanave (CC BY 4.0)',
     rulerQuestion: 'Quem governou o Brasil neste período?',
     notInauguratedQuestion: 'Quem foi eleito presidente neste ano, mas não tomou posse?',
-    rulerAnswerPlaceholder: 'Nome do governante',
     starsLabel: (stars: number) => `${stars} de 10 estrelas`,
   },
   result: {
     title: 'Fim do tempo!',
+    rulersTitle: 'Fim do quiz!',
+    correctAnswers: 'Acertos',
+    outOf: (score: number, total: number) => `${score}/${total}`,
+    time: 'Tempo',
     score: 'Resultado',
     wrongAnswers: 'Respostas erradas',
     stars: 'Estrelas',
@@ -81,6 +102,7 @@ export const messages = {
     },
     name: 'Nome',
     score: 'Resultado',
+    time: 'Tempo',
     empty: 'Ainda não há resultados.',
     loading: 'Carregando…',
     back: 'Voltar',
@@ -97,6 +119,15 @@ export const messages = {
     period: (from: string, to: string) => `${from} a ${to}`,
     sinceUntilToday: (from: string) => `${from} até hoje`,
   },
+  rulers: {
+    elapsed: (durationMs: number) => `Tempo: ${formatDuration(durationMs)}`,
+    progress: (current: number, total: number) => `Pergunta ${current} de ${total}`,
+    correctCount: (score: number) => `Acertos: ${score}`,
+    optionsLabel: 'Alternativas',
+    correct: 'Acertou!',
+    wrong: (answer: string) => `Errou! Era ${answer}.`,
+  },
+  formatDuration,
   guestName: 'Você',
   auth: {
     login: 'Entrar',

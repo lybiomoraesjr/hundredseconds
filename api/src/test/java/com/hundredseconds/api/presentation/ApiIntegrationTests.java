@@ -210,6 +210,31 @@ class ApiIntegrationTests {
 	}
 
 	@Test
+	void timeTrialLeaderboardShouldBreakTiesByShortestDuration() throws Exception {
+		postJson("/api/scores", """
+				{"gameMode": "RULERS_MILITARY", "score": 6, "wrongAnswers": 0, "durationMs": 61000, "playerName": "Slow"}
+				""", null).andExpect(status().isCreated()).andExpect(jsonPath("$.durationMs").value(61000));
+		postJson("/api/scores", """
+				{"gameMode": "RULERS_MILITARY", "score": 6, "wrongAnswers": 0, "durationMs": 30000, "playerName": "Fast"}
+				""", null).andExpect(status().isCreated());
+
+		mockMvc.perform(get("/api/scores/leaderboard").param("mode", "RULERS_MILITARY").param("period", "DAY"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].playerName").value("Fast"))
+			.andExpect(jsonPath("$[0].durationMs").value(30000))
+			.andExpect(jsonPath("$[1].playerName").value("Slow"));
+	}
+
+	@Test
+	void timeTrialWithoutDurationShouldBeRejected() throws Exception {
+		postJson("/api/scores", """
+				{"gameMode": "RULERS_ALL", "score": 10, "wrongAnswers": 0, "playerName": "Ana"}
+				""", null)
+			.andExpect(status().isUnprocessableContent())
+			.andExpect(jsonPath("$.code").value("IMPLAUSIBLE_SCORE"));
+	}
+
+	@Test
 	void ownResultsShouldRequireLogin() throws Exception {
 		mockMvc.perform(get("/api/scores/leaderboard").param("mode", "EXPONENTIATION").param("period", "USER"))
 			.andExpect(status().isUnauthorized())

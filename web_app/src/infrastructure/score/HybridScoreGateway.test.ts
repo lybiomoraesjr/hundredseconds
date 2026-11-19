@@ -74,6 +74,13 @@ describe('HybridScoreGateway', () => {
       expect(api.save).toHaveBeenCalledWith({ gameMode: GameMode.EXPONENTIATION, score: 42, wrongAnswers: 3 }, 'jwt')
     })
 
+    it('sends the duration of the rulers time trials', async () => {
+      logIn()
+      await gateway.saveScore({ mode: GameMode.RULERS_ALL, score: 40, wrongAnswers: 10, durationMs: 123_400 })
+      expect(api.save).toHaveBeenCalledWith(
+        { gameMode: GameMode.RULERS_ALL, score: 40, wrongAnswers: 10, durationMs: 123_400 }, 'jwt')
+    })
+
     it('keeps the match locally when the API save fails', async () => {
       logIn()
       api.save.mockRejectedValue(new ApiError(0, 'NETWORK_ERROR', 'offline'))

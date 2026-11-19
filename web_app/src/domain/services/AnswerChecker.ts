@@ -1,4 +1,4 @@
-import { isTextQuestion, type Question } from '../entities/Question'
+import { isStateQuestion, type Question } from '../entities/Question'
 import { parseAnswer } from './AnswerParser'
 
 /** EMPTY means there is nothing to check (blank or invalid input) and must not count as a mistake. */
@@ -23,7 +23,7 @@ function comparable(text: string): string {
 }
 
 export function checkAnswer(question: Question, input: string): AnswerCheck {
-  if (isTextQuestion(question)) {
+  if (isStateQuestion(question)) {
     const typed = comparable(input)
     if (typed === '') return 'EMPTY'
     return question.acceptedAnswers.some((accepted) => comparable(accepted) === typed) ? 'CORRECT' : 'WRONG'

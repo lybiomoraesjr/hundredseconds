@@ -11,6 +11,8 @@ export interface LeaderboardEntry {
   readonly rank: number
   readonly playerName: string
   readonly score: number
+  /** How long a rulers time trial took; null for the 100 second games. */
+  readonly durationMs: number | null
   /** ISO-8601 date time */
   readonly playedAt: string
 }
@@ -19,6 +21,8 @@ export interface FinishedMatch {
   readonly mode: GameMode
   readonly score: number
   readonly wrongAnswers: number
+  /** Only for the rulers time trials. */
+  readonly durationMs?: number
 }
 
 /** Where scores are read from and saved to (browser storage and/or the API). */

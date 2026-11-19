@@ -54,6 +54,17 @@ describe('LocalScoreGateway', () => {
     expect(week).toHaveLength(10)
   })
 
+  it('breaks ties of the rulers time trials by the shortest time', async () => {
+    const storage = new MemoryStorage()
+    const gateway = gatewayAt(storage, '2026-03-15T12:00:00')
+    await gateway.saveScore({ mode: GameMode.RULERS_EMPIRE, score: 6, wrongAnswers: 0, durationMs: 50_000 })
+    await gateway.saveScore({ mode: GameMode.RULERS_EMPIRE, score: 6, wrongAnswers: 0, durationMs: 30_000 })
+    await gateway.saveScore({ mode: GameMode.RULERS_EMPIRE, score: 5, wrongAnswers: 1, durationMs: 10_000 })
+
+    const ranking = await gateway.getLeaderboard(GameMode.RULERS_EMPIRE, LeaderboardPeriod.USER)
+    expect(ranking.map((entry) => [entry.score, entry.durationMs])).toEqual([[6, 30_000], [6, 50_000], [5, 10_000]])
+  })
+
   it('survives broken or unavailable storage', async () => {
     const broken = {
       getItem: () => '{not json',

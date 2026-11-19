@@ -93,6 +93,24 @@ class GameScoreRepositoryAdapterTests {
 	}
 
 	@Test
+	void timeTrialTiesShouldBeBrokenByTheShortestDuration() {
+		saveTimeTrial("Slow", 6, 90_000, MARCH_15);
+		saveTimeTrial("Fast", 6, 40_000, MARCH_15.plusSeconds(60));
+		saveTimeTrial("Fastest but missed one", 5, 20_000, MARCH_15);
+
+		List<LeaderboardEntry> top = gameScoreRepository.findTopScores(GameMode.RULERS_EMPIRE, MARCH_14_TO_16, 10);
+
+		assertThat(top).extracting(LeaderboardEntry::playerName)
+			.containsExactly("Fast", "Slow", "Fastest but missed one");
+		assertThat(top.get(0).durationMs()).isEqualTo(40_000);
+	}
+
+	private void saveTimeTrial(String name, int score, int durationMs, Instant playedAt) {
+		gameScoreRepository.save(GameScore.create(null, new PlayerName(name), GameMode.RULERS_EMPIRE, score, 0,
+				durationMs, playedAt));
+	}
+
+	@Test
 	void topScoresByUserShouldReturnOnlyThatUser() {
 		save(anaId, "Ana", GameMode.ROOT_EXTRACTION, 20, MARCH_10);
 		save(anaId, "Ana", GameMode.ROOT_EXTRACTION, 35, MARCH_15);
